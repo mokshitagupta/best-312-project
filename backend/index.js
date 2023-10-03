@@ -1,4 +1,3 @@
-
 const express = require('express')
 var bodyParser = require('body-parser');
 var multer = require('multer');
@@ -25,6 +24,30 @@ app.use(express.urlencoded({ extended: true }))
 // for parsing multipart/form-data
 app.use(upload.array()); 
 
+
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
+function createAuthToken(length, user){
+  let choices = "abcdefgehijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+  let ret = ""
+
+  for(let i=0; i < length ; i++){
+    let char = Math.floor(Math.random() * choices.length)
+    ret += char.toString()
+  }
+
+  entry = {
+    path :"/tokens",
+    token:ret,
+    user: user, 
+  }
+
+  db.dbInsert(entry)
+
+  return ret
+}
+
 function handleLogin(req, res){
   console.log(req.body)
   const email = req.body.email
@@ -32,14 +55,24 @@ function handleLogin(req, res){
   const password = req.body.password
 
 
-  if (email && email.length>0 || username && username.length>0){
+  if ((email && email.length>0) || (username && username.length>0)){
+
+    console.log("starting")
     db.dbFind("email", email)
     .then((queryEmail) => {
-      if (queryEmail && queryEmail.length > 0) {
+      if (queryEmail) {
         bcrypt.compare(password, queryEmail.password)
         .then((result) => {
+          console.log("result of pass comp: ", result)
           if (result == true){
-            res.send(JSON.stringify({success:true, msg:'Login Successful!'}))
+            let token = createAuthToken(length=8, user=myID)
+
+            console.log(token, entry, "YOUR TOKEN")
+
+            res.cookie('token', token, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true}) // 24 hours
+            res.cookie('id', myID, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true})
+
+            res.send(JSON.stringify({userID:myID,token: token,success:true, msg:'Login Successful!'}))
             return true
           }else {
             res.status(401).send(JSON.stringify({success:false, msg:'Incorrect password'}))
@@ -61,8 +94,17 @@ function handleLogin(req, res){
           if (queryEmail ) {
             bcrypt.compare(password, queryEmail.password)
             .then((result) => {
+              console.log("result of pass comp: ", result)
               if (result == true){
-                res.send(JSON.stringify({success:true, msg:'Login Successful!'}))
+                let token = createAuthToken(length=8, user=myID)
+
+                console.log(token, entry, "YOUR TOKEN")
+
+                res.cookie('token', token, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true}) // 24 hours
+                res.cookie('id', myID, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true})
+
+                res.send(JSON.stringify({userID:myID,token: token,success:true, msg:'Login Successful!'}))
+                
                 return true
               }else {
                 res.status(401).send(JSON.stringify({success:false, msg:'Incorrect password'}))
@@ -70,12 +112,6 @@ function handleLogin(req, res){
               }
             })
           }else{
-            return false
-          }
-        })
-
-        .then(valid => {
-          if (valid == false){
             res.status(401).send(JSON.stringify({success:false, msg:'Email or password not found...'}))
           }
         })
@@ -151,7 +187,15 @@ function handleRegister(req, res){
         db.dbInsert(entry)
         .then(() => {
           console.log("inserted: ", entry)
-          res.send(JSON.stringify({success:true, id:entry._id, msg:'Registration was successful!'}))
+
+          let token = createAuthToken(length=8, user=myID)
+
+          console.log(token, entry, "YOUR TOKEN")
+
+          res.cookie('token', token, {maxAge: 24 * 60 * 60 * 1000}) // 24 hours
+          res.cookie('id', myID, {maxAge: 24 * 60 * 60 * 1000}) 
+          res.send(JSON.stringify({userID:myID,token: token,success:true, msg:'Registration was successful!!'}))
+          // res.send(JSON.stringify({success:true, id:entry._id, msg:'Registration was successful!'}))
         })
         .catch((err) => console.log(err))
   
