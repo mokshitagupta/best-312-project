@@ -1,9 +1,9 @@
 FROM ubuntu:18.04
 RUN apt-get update
 # Set the home directory to /root
-ENV HOME /pt1
+ENV HOME /root
 # cd into the home directory
-WORKDIR /pt1
+WORKDIR /root
 # Install Node
 RUN apt-get update --fix-missing
 RUN apt-get install -y nodejs
@@ -16,4 +16,4 @@ RUN npm install
 # from outside the container
 EXPOSE 8080
 # Run the app
-CMD node app.js
+CMD node index.js
