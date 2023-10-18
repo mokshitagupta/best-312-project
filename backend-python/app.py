@@ -1,4 +1,4 @@
-from flask import Flask, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from flask import Flask, render_template_string, render_template, request, Response, make_response, redirect, url_for, session
 from pymongo import MongoClient
 import bcrypt, random
 from db import *
@@ -106,13 +106,15 @@ def create_app():
         detail = form["detail"]
         username = form["username"]
         name = request.cookies.get('token')
+        likes = []
 
         entry = {
             "_id" : increment(),
             "title":title,
             "detail" : detail,
             "username" : username,
-            "feature":"posts"
+            "feature":"posts",
+            "likes": likes
         }
         
 
