@@ -96,7 +96,36 @@ def create_app():
         # String-based templates
         entry =  dbQuery("_id", int(id), all=False, raw=True)
         print(entry,id)
-        return render_template('profile.html', username=entry["username"])
+        return render_template('profile.html', username=entry["username"], username_hidden=entry["username"])
+
+    @app.route('/add-post', methods=["POST"])
+    def addPost():
+        form = request.form
+        title = form["title"]
+        detail = form["detail"]
+        username = form["username"]
+        name = request.cookies.get('token')
+
+        entry = {
+            "_id" : increment(),
+            "title":title,
+            "detail" : detail,
+            "username" : username,
+            "feature":"posts"
+        }
+        
+
+        dbInsert(entry)
+        comments = dbQuery("feature", "posts", all=True, raw=True)
+
+        return redirect(request.referrer)
+
+    @app.route('/get-posts', methods=["GET"])
+    def getPosts():
+
+        comments = dbQuery("feature", "posts", all=True, raw=True)
+        return comments
+
     
     return app
 
