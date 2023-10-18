@@ -48,8 +48,9 @@ def create_app():
 
             print(userEntry, " <----- inserted to db")
             dbInsert(userEntry)
+            return redirect(url_for("login"))
 
-            return render_template('register.html', feedback="Account succesfully created"),200        
+            # return render_template('register.html', feedback="Account succesfully created"),200        
         else:
         # String-based templates
             
