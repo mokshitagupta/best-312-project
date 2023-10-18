@@ -14,6 +14,6 @@ COPY . .
 RUN npm install
 # Allow port 8080 to be accessed
 # from outside the container
-EXPOSE 8080
+EXPOSE 3000
 # Run the app
 CMD node app.js

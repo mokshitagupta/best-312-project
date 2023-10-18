@@ -108,8 +108,6 @@ export default function Register(){
             <div class="flex-banner">
                 
                 <div class="reg-form">
-
-                    <p>Passwords must contain 8 characters, with atleast 1 number and letter</p>
                     <form id="register-form">
                         <span class="">Email:</span> <br></br><br></br>
                         <input class="" type="text" name="email"></input> <br></br>                        

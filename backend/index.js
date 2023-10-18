@@ -13,7 +13,7 @@ var cors = require('cors')
 
 app.use(cors())
 
-const port = 3008
+const port = 3000
 
 app.use(bodyParser.json()); 
 
@@ -65,14 +65,14 @@ function handleLogin(req, res){
         .then((result) => {
           console.log("result of pass comp: ", result)
           if (result == true){
-            let token = createAuthToken(length=8, user=myID)
+            let token = createAuthToken(length=8, user=queryEmail._id)
 
             console.log(token, entry, "YOUR TOKEN")
 
             res.cookie('token', token, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true}) // 24 hours
-            res.cookie('id', myID, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true})
+            res.cookie('id', queryEmail._id, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true})
 
-            res.send(JSON.stringify({userID:myID,token: token,success:true, msg:'Login Successful!'}))
+            res.send(JSON.stringify({userID:queryEmail._id,token: token,success:true, msg:'Login Successful!'}))
             return true
           }else {
             res.status(401).send(JSON.stringify({success:false, msg:'Incorrect password'}))
@@ -96,14 +96,14 @@ function handleLogin(req, res){
             .then((result) => {
               console.log("result of pass comp: ", result)
               if (result == true){
-                let token = createAuthToken(length=8, user=myID)
+                let token = createAuthToken(length=8, user=queryEmail._id)
 
                 console.log(token, entry, "YOUR TOKEN")
 
                 res.cookie('token', token, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true}) // 24 hours
-                res.cookie('id', myID, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true})
+                res.cookie('id', queryEmail._id, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true})
 
-                res.send(JSON.stringify({userID:myID,token: token,success:true, msg:'Login Successful!'}))
+                res.send(JSON.stringify({userID:queryEmail._id,token: token,success:true, msg:'Login Successful!'}))
                 
                 return true
               }else {
