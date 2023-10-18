@@ -2,6 +2,7 @@ from flask import Flask, render_template_string, render_template, request, Respo
 from pymongo import MongoClient
 import bcrypt, random
 from db import *
+from likes import *
 
 class ConfigClass(object):
     # Flask settings
@@ -97,7 +98,7 @@ def create_app():
         entry =  dbQuery("_id", int(id), all=False, raw=True)
         print(entry,id)
         return render_template('profile.html', username=entry["username"])
-    
+
     return app
 
 
