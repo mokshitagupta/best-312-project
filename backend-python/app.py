@@ -105,28 +105,8 @@ def create_app():
         detail = form["detail"]
         username = form["username"]
         name = request.cookies.get('token')
-
-        entry = {
-            "_id": increment(),
-            "title": title,
-            "detail": detail,
-            "username": username,
-            "feature": "posts"
-        }
-
-        dbInsert(entry)
-        comments = dbQuery("feature", "posts", all=True, raw=True)
-
-        return redirect(request.referrer)
-
-    @app.route('/add-post', methods=["POST"])
-    def addPost():
-        form = request.form
-        title = form["title"]
-        detail = form["detail"]
-        username = form["username"]
-        name = request.cookies.get('token')
         likes = []
+        like_count = 0
 
         entry = {
             "_id": increment(),
@@ -134,7 +114,8 @@ def create_app():
             "detail": detail,
             "username": username,
             "feature": "posts",
-            "likes": likes
+            "likes": likes,
+            "like_count": like_count
         }
 
         # If the user is authenticated post the message
@@ -148,14 +129,15 @@ def create_app():
         else:
             return render_template('index.html', feedback="user is not authenticated"), 401
 
-    @app.route('/like', methods=["POST"])
+    @app.route('/like', methods=["PUT"])
     def like_post():
+        request.get_json()
+        post_id = ["_id"]
         auth_token = request.cookies.get('token')
         username = validate_user(auth_token)
         if username is not None:
             post_id = ""
             like(post_id, username)
-            pass
         return
 
     @app.route('/get-posts', methods=["GET"])

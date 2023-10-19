@@ -19,13 +19,15 @@ def validate_user(auth_token):
 
 
 def like(post_id, username):
-    post = dbQuery("_id", post_id)
+    post = dbQuery({"_id"}, post_id)
     likes = set(post["likes"])
     if username in likes:
         likes.remove(username)
     else:
         likes.add(username)
     likes = list(likes)
-    dbUpdate("likes", likes)
+    update_likes = {"likes": likes}
     count = (len(likes))
-    return count
+    update_count = {"count": count}
+    dbUpdate(update_count, post_id)
+
