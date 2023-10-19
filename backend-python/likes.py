@@ -28,6 +28,6 @@ def like(post_id, username):
     likes = list(likes)
     update_likes = {"likes": likes}
     count = (len(likes))
-    update_count = {"count": count}
+    update_count = {"like_count": count}
     dbUpdate(update_count, post_id)
 
