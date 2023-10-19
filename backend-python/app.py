@@ -131,12 +131,11 @@ def create_app():
 
     @app.route('/like', methods=["PUT"])
     def like_post():
-        request.get_json()
-        post_id = ["_id"]
+        body = request.get_json()
+        post_id = body["_id"]
         auth_token = request.cookies.get('token')
         username = validate_user(auth_token)
         if username is not None:
-            post_id = ""
             like(post_id, username)
         return
 
