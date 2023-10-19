@@ -26,4 +26,4 @@ def like(self, post_id, username):
     likes = list(likes)
     dbUpdate("likes", likes)
     count = (len(likes))
-    return
+    return count
