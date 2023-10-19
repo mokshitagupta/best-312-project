@@ -2,8 +2,55 @@
 
 {% block profile %}
 
-<h2>Welcome back {{username}}!</h2>
+    
+
+    <h2>Welcome back {{username}}!</h2>
+
+    <h3>Make a post!</h3>
+    <div class="fixed">
+        <div class="flex-banner">
+            
+            <div class="reg-form">
+                <form id="register-form" action="{{ url_for('addPost') }}" method="post">
+                    <span class=""> Title:</span>
+                    <input class="" type="text" name="title" required maxlength="20"></input> <br></br>
+                    <span class=""> Description:</span> 
+                    <input class="" type="text" name="detail" required maxlength="120"></input> <br></br>
+                    <input class="" value="{{username_hidden}}" type="text" name="username" hidden></input> <br></br>
+
+                    <button  class="button right">Post</button>
+                    
+            
+                </form>
+
+                
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="comments"></div>
+    <script>
 
 
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "{{ url_for('getPosts') }}");
+        xhttp.onreadystatechange = function () {
+            if (this.readyState === 4 && this.status === 200) {
+                const messages = JSON.parse(this.response);
+                for (const message of messages) {
+                    document.getElementById("comments").innerHTML+= `<i>${message.username}: </i><b> ${message.title}</b> <br><p>${message.detail}</p><br>`
+                }
+            }
+        };
+        xhttp.send();
+        
+    </script>
+
+
+    {% block comments %}
+    {% endblock %}
 
 {% endblock %}
+
