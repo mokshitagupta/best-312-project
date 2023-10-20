@@ -7,18 +7,12 @@ item_1 = {
   "count": 2,
 }
 
-
-
-
-
-
 def getDB():
     CONNECTION_STRING = "mongodb+srv://max:lqfQqU0nP22yK9LI@cluster0.0gehlmn.mongodb.net/?retryWrites=true&w=majority"
     client = MongoClient('localhost')
     # client = MongoClient('mongo') 
 
     return client['example']
-
 
 
 def dbInsert(entry):

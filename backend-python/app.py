@@ -1,6 +1,7 @@
 from flask import Flask, render_template_string, render_template, request, Response, make_response, redirect, url_for, session
 from pymongo import MongoClient
-import bcrypt, random
+import bcrypt
+import random
 from db import *
 
 class ConfigClass(object):
