@@ -1,6 +1,6 @@
 FROM python:3.8
-ENV HOME /root
-WORKDIR /root
+ENV HOME /backend-python
+WORKDIR /backend-python
 COPY . .
 # Download dependancies
 RUN pip3 install -r requirements.txt
