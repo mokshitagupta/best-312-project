@@ -8,10 +8,6 @@ item_1 = {
 }
 
 
-
-
-
-
 def getDB():
     CONNECTION_STRING = "mongodb+srv://max:lqfQqU0nP22yK9LI@cluster0.0gehlmn.mongodb.net/?retryWrites=true&w=majority"
     client = MongoClient('localhost')
@@ -115,12 +111,13 @@ def dbDelete(val):
 def dbClean():
     dbname = getDB()
     collection_name = dbname["user_1_items"]
-    collection_name.delete_many({"path":"/auth-history"})
+    collection_name.delete_many({"feature":"sessionToken"})
     # collection_name.delete_many({"feature":"img_count"})
     increment(img=True)
 
     
 # dbClean()
+
 
 def getSalt():
     salt = dbQuery("feature", "salt", all=False, raw=True)

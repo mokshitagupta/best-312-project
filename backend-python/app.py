@@ -78,7 +78,7 @@ def create_app():
 
             token  = "".join([str(random.randint(0,9) )for _ in range(10)])
             s = getSalt()
-            hash = bcrypt.hashpw(token.encode(), s)
+            hash = bcrypt.hashpw(token.encode("utf-8"), s)
 
             insertSessionId(hash, username)
 
@@ -114,6 +114,16 @@ def create_app():
             "username" : username,
             "feature":"posts"
         }
+
+        print(name, "nameeurd", getSalt())
+
+
+        salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
+
+        # print(dbQuery("feature","sessionToken", raw=True), salted)
+
+        if len(dbQuery("hash",salted, raw=True)) == 0:
+            return redirect(request.referrer), 403
         
 
         dbInsert(entry)
