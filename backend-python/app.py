@@ -119,7 +119,7 @@ def create_app():
         }
 
         # If the user is authenticated post the message
-        if validate_user(name) != None:
+        if validate_user(name) is not None:
             dbInsert(entry)
             comments = dbQuery("feature", "posts", all=True, raw=True)
 
@@ -137,7 +137,9 @@ def create_app():
         username = validate_user(auth_token)
         if username is not None:
             like(post_id, username)
-        return
+            return
+        else:
+            return render_template('index.html', feedback="user is not authenticated"), 401
 
     @app.route('/get-posts', methods=["GET"])
     def getPosts():

@@ -31,4 +31,3 @@ def like(post_id, username):
     update_count = {"like_count": count}
     dbUpdate(update_likes, post_id)
     dbUpdate(update_count, post_id)
-
