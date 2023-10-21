@@ -145,7 +145,7 @@ def create_app():
         if exists is True:
             username = entry["username"]
             post = dbQuery("_id", postID, raw=True)
-
+            
     return app
 
 
