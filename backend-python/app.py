@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, render_template_string, render_template, request, Response, make_response, redirect, url_for
 from pymongo import MongoClient
 import bcrypt, random, html
@@ -131,20 +133,23 @@ def create_app():
     def getPosts():
 
         comments = dbQuery("feature", "posts", all=True, raw=True)
-        return comments
+        return json.dumps(comments)
 
     @app.route('/like', methods=["POST"])
     def likePost():
-        postID = request.json
+        postID = request.json['id']
         print(f"post ID = {postID}")
         authToken = request.cookies.get('token')
         salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
         userDocument = dbQuery("hash", salted, raw=True)[0]
         username = userDocument["username"]
+        print(f"user doc = {userDocument},\nusername = {username}")
         if len(userDocument) == 0:
             return redirect(request.referrer), 403
         else:
-            post = dbQuery("_id", postID, all=False, raw=True)[0]
+            post = dbQuery("_id", postID, all=False, raw=True)
+            # print(f"query = " + dbQuery("_id", postID, all=False, raw=True))
+            print(f"post = {post}")
             likesUpdater = post["likes"]
             print(f"likes = {likesUpdater}")
             if username not in likesUpdater:
@@ -153,6 +158,7 @@ def create_app():
                 likesUpdater.remove(username)
             updateVal = {"likes": likesUpdater}
             dbUpdate(postID, updateVal)
+            return ""
 
     return app
 
@@ -160,4 +166,4 @@ def create_app():
 # Start development web server
 if __name__ == '__main__':
     app = create_app()
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)

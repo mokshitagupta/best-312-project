@@ -56,7 +56,10 @@
                         <b> ${message.title}</b>
                         <br>
                         <p>${message.detail}</p>
-                        <button onclick="sendToBrendan(${message._id})"> Like </button>
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="sendToBrendan(${message._id})"> Like </button>
+                            <p>${message.likes.length}</p>
+                        </div>
                         <br>
                         <key value=${message._id}></key>
                         <br>
@@ -68,8 +71,8 @@
             xhttp.send();
         }
 
-        setInterval(poll, 2000);
-
+        setInterval(poll, 1000);
+        {#poll()#}
         
         
     </script>
