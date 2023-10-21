@@ -136,6 +136,7 @@ def create_app():
     @app.route('/like', methods=["POST"])
     def likePost():
         postID = request.json
+        print(f"post ID = {postID}")
         authToken = request.cookies.get('token')
         salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
         user = dbQuery("hash", salted, raw=True)
@@ -144,7 +145,15 @@ def create_app():
         exists, entry = getUserEntry("path", "registeredUsers", user[0]["username"], all=True)
         if exists is True:
             username = entry["username"]
-            post = dbQuery("_id", postID, raw=True)
+            post = dbQuery("_id", postID, all=False,raw=True)[0]
+            likesUpdater = set(post["likes"])
+            if username not in likesUpdater:
+                likesUpdater.add(username)
+            else:
+                likesUpdater.remove(username)
+            updateVal = {"likes":likesUpdater}
+            dbUpdate(postID, updateVal)
+
             
     return app
 
