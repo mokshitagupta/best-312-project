@@ -5,11 +5,13 @@ from db import *
 
 app = Flask(__name__)
 
-mongo_client = MongoClient('localhost', 27017)
-
 
 def validate_user(auth_token):
-    exists, user = dbExist("feature", "sessionToken", auth_token)
+    salt = getSalt()
+    Check_Token = bcrypt.hashpw(auth_token.encode(), salt)
+    exists, user = dbExist("feature", "sessionToken", Check_Token)
+
+    print(f"user exists: {exists}, their auth token is {Check_Token}")
     # equivalent database.find_one(auth_token) #returns None if the user does not exist
     if exists:
         username = user["username"]

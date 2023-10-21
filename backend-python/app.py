@@ -119,7 +119,9 @@ def create_app():
         }
 
         # If the user is authenticated post the message
+        print(f"auth token = {name}")
         if validate_user(name) is not None:
+            print(f"username is {username}")
             dbInsert(entry)
             comments = dbQuery("feature", "posts", all=True, raw=True)
 
@@ -127,6 +129,7 @@ def create_app():
 
         # else return to index.html since user is not authenticated
         else:
+            print(f"username = {None}")
             return render_template('index.html', feedback="user is not authenticated"), 401
 
     @app.route('/like', methods=["PUT"])
