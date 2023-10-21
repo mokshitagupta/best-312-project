@@ -139,22 +139,21 @@ def create_app():
         print(f"post ID = {postID}")
         authToken = request.cookies.get('token')
         salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
-        user = dbQuery("hash", salted, raw=True)
-        if len(user) == 0:
+        userDocument = dbQuery("hash", salted, raw=True)[0]
+        username = userDocument["username"]
+        if len(userDocument) == 0:
             return redirect(request.referrer), 403
-        exists, entry = getUserEntry("path", "registeredUsers", user[0]["username"], all=True)
-        if exists is True:
-            username = entry["username"]
-            post = dbQuery("_id", postID, all=False,raw=True)[0]
-            likesUpdater = set(post["likes"])
+        else:
+            post = dbQuery("_id", postID, all=False, raw=True)[0]
+            likesUpdater = post["likes"]
+            print(f"likes = {likesUpdater}")
             if username not in likesUpdater:
-                likesUpdater.add(username)
+                likesUpdater.append(username)
             else:
                 likesUpdater.remove(username)
-            updateVal = {"likes":likesUpdater}
+            updateVal = {"likes": likesUpdater}
             dbUpdate(postID, updateVal)
 
-            
     return app
 
 
