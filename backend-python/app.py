@@ -137,7 +137,17 @@ def create_app():
         comments = dbQuery("feature", "posts", all=True, raw=True)
         return comments
 
-    
+    @app.route('/like', methods=["POST"])
+    def likePost():
+        authToken = request.cookies.get('token')
+        salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
+        user = dbQuery("hash", salted, raw=True)
+        if len(user) == 0:
+            return redirect(request.referrer), 403
+        exists, entry = getUserEntry("path", "registeredUsers", user[0]["username"], all=True)
+        if exists is True:
+            username = entry["username"]
+            
     return app
 
 
