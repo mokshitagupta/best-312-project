@@ -22,14 +22,29 @@ def dbInsert(entry):
     collection_name = dbname["user_1_items"]
     collection_name.insert_one(entry)
 
-def dbExist(key, value, find):
-    entries = dbQuery(key, value, raw=True, all=True)
+def dbExist(key, value, find, all=True):
+    entries = dbQuery(key, value, raw=True, all=all)
+    print(entries)
     found = False
     ret = {}
 
     # #print("Hear are the results: ", entries)
     for e in entries:
         if find in e:
+            found = True
+            ret = e
+            break
+    return found, ret
+
+def getUserEntry(key, value, find, all=True):
+    entries = dbQuery(key, value, raw=True, all=all)
+    print(entries)
+    found = False
+    ret = {}
+
+    # #print("Hear are the results: ", entries)
+    for e in entries:
+        if e["username"] == find:
             found = True
             ret = e
             break

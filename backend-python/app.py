@@ -1,6 +1,6 @@
 from flask import Flask, render_template_string, render_template, request, Response, make_response, redirect, url_for
 from pymongo import MongoClient
-import bcrypt, random
+import bcrypt, random, html
 from db import *
 
 class ConfigClass(object):
@@ -19,11 +19,21 @@ def create_app():
     @app.route('/')
     def home_page():
         # String-based templates
-        return """
-                <h2>Home page</h2>
-                <p><a href="/register">Register</a></p>
-                <p><a href="/login">Login</a></p>
-            """
+        name = request.cookies.get('token')
+        if name == None:
+            #no auth token
+            return render_template('register.html')
+        
+        salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
+        query = dbQuery("hash",salted, raw=True)
+        if len(query) == 0:
+            return render_template('register.html')
+        
+        else:
+            exists, entry =  getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
+            print(exists, entry)
+            return render_template('profile.html', username=entry["username"], username_hidden=entry["username"])
+
     
     @app.route('/register', methods=['POST',"GET"])
     def register():
@@ -41,16 +51,15 @@ def create_app():
             userEntry = {
                 "_id" : increment(),
                 "path" : "registeredUsers",
-                "username": username,
+                "username": html.escape(username),
                 "password" : bcrypt.hashpw(password.encode(), s),
                 "xsrf": "".join([str(random.randint(0,9) )for _ in range(5)])
             }
 
             print(userEntry, " <----- inserted to db")
             dbInsert(userEntry)
-            return redirect(url_for("login"))
-
-            # return render_template('register.html', feedback="Account succesfully created"),200        
+            return render_template('register.html', feedback="registration successful"),200
+            
         else:
         # String-based templates
             
@@ -68,36 +77,27 @@ def create_app():
             exists = entry != []
 
             if not exists:
-                return render_template('login.html', feedback="user not in db"),404
+                return render_template('register.html', login_feedback="user not in db"),404
 
             #verify passwords
             verif = bcrypt.checkpw(password.encode("utf-8"), entry["password"])
             # #print("ABLE TO VERIFY PASSWORD !!!")
             if not verif:
-                return render_template('login.html', feedback="invalid credentials"),403
+                return render_template('register.html', login_feedback="invalid credentials"),403
 
             token  = "".join([str(random.randint(0,9) )for _ in range(10)])
             s = getSalt()
             hash = bcrypt.hashpw(token.encode("utf-8"), s)
 
             insertSessionId(hash, username)
-
-            # resp = make_response(render_template('profile.html', username=username))
             
-            response = make_response(redirect(url_for("profilePage",id=str(entry["_id"]))))
+            response = make_response(redirect(url_for("home_page")))
             response.set_cookie("token", value = token, max_age = 60 * 60 * 24, httponly = True)
 
             return response
         else :
-            return render_template('login.html')
+            return render_template('register.html')
 
-
-    @app.route('/profile/<id>')
-    def profilePage(id):
-        # String-based templates
-        entry =  dbQuery("_id", int(id), all=False, raw=True)
-        print(entry,id)
-        return render_template('profile.html', username=entry["username"], username_hidden=entry["username"])
 
     @app.route('/add-post', methods=["POST"])
     def addPost():
@@ -109,9 +109,9 @@ def create_app():
 
         entry = {
             "_id" : increment(),
-            "title":title,
-            "detail" : detail,
-            "username" : username,
+            "title": html.escape(title),
+            "detail" : html.escape(detail),
+            "username" : html.escape(username),
             "feature":"posts"
         }
 
