@@ -7,10 +7,11 @@ item_1 = {
   "count": 2,
 }
 
+
 def getDB():
     CONNECTION_STRING = "mongodb+srv://max:lqfQqU0nP22yK9LI@cluster0.0gehlmn.mongodb.net/?retryWrites=true&w=majority"
-    client = MongoClient('localhost')
-    # client = MongoClient('mongo') 
+    # client = MongoClient('localhost')
+    client = MongoClient('mongo')
 
     return client['example']
 
@@ -20,14 +21,29 @@ def dbInsert(entry):
     collection_name = dbname["user_1_items"]
     collection_name.insert_one(entry)
 
-def dbExist(key, value, find):
-    entries = dbQuery(key, value, raw=True, all=True)
+def dbExist(key, value, find, all=True):
+    entries = dbQuery(key, value, raw=True, all=all)
+    print(entries)
     found = False
     ret = {}
 
     # #print("Hear are the results: ", entries)
     for e in entries:
         if find in e:
+            found = True
+            ret = e
+            break
+    return found, ret
+
+def getUserEntry(key, value, find, all=True):
+    entries = dbQuery(key, value, raw=True, all=all)
+    print(entries)
+    found = False
+    ret = {}
+
+    # #print("Hear are the results: ", entries)
+    for e in entries:
+        if e["username"] == find:
             found = True
             ret = e
             break
@@ -109,12 +125,13 @@ def dbDelete(val):
 def dbClean():
     dbname = getDB()
     collection_name = dbname["user_1_items"]
-    collection_name.delete_many({"path":"/auth-history"})
+    collection_name.delete_many({"feature":"sessionToken"})
     # collection_name.delete_many({"feature":"img_count"})
     increment(img=True)
 
     
 # dbClean()
+
 
 def getSalt():
     salt = dbQuery("feature", "salt", all=False, raw=True)
