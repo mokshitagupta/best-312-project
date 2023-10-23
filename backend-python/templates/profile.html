@@ -31,7 +31,9 @@
     </div>
     <h1> Comments</h1>
 
-    <div id="comments"></div>
+    <div class="contents">
+        <div id="comments"></div>
+    </div>
     
     <script>
 
@@ -52,13 +54,21 @@
                     const messages = JSON.parse(this.response);
                     document.getElementById("comments").innerHTML = ""
                     for (const message of messages) {
-                        document.getElementById("comments").innerHTML+= `<i>${message.username}: </i>
-                        <b> ${message.title}</b>
-                        <br>
-                        <p>${message.detail}</p>
-                        <div style="display:flex; gap:10px;">
-                            <button onclick="sendToBrendan(${message._id})"> Like </button>
-                            <p>${message.likes.length}</p>
+                        document.getElementById("comments").innerHTML+= `<div class="post_header">${message.username}: </div>
+                        <p>
+                        <div class="post_bg"> <b>${message.title}</b>
+                            <div class="post_content">
+                                <br>
+                                <p>${message.detail}</p>
+                                <p>
+                                <span style="margin-top: 20px;"></span>
+                                <div class="post_likes">
+                                    ${message.likes.length}
+                                    <span style="padding-left: 50px;">
+                                        <button class="btn" onclick="sendToBrendan(${message._id})"> Like </button>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                         <br>
                         <key value=${message._id}></key>

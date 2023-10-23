@@ -1,0 +1,241 @@
+:root{
+    --pink: #d4afb9;
+    --blue: #9cadce;
+    --dark-blue: #7286ad;
+    --pale-pink: #f2e1e6;
+}
+
+/*scrollbar*/
+
+::-webkit-scrollbar {width: 5px; height:1px;}
+::-webkit-scrollbar-thumb {background:var(--pink); border-radius: 50px;}
+::-webkit-scrollbar-track-piece {background:transparent;}
+
+body {
+    background-color: var(--blue);
+    background-image: url('bg.jpg');
+    background-repeat: repeat;
+    background-blend-mode: soft-light;
+    color: white;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    flex: 1;
+}
+
+a {
+    color: white;
+    text-decoration: none;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+th {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+input {
+    border-radius: 10px;
+    background-color: var(--pale-pink);
+    border: 0px;
+    padding: 5px;
+    margin-left: 20px;
+}
+
+button {
+    border-radius: 50px;
+    background-color: var(--pink);
+    border: 0px;
+    padding: 5px;
+    padding-left: 15px;
+    padding-right: 15px;
+    color: white;
+}
+
+button:hover {
+    background-color: var(--blue);
+}
+
+.my_image {
+    width: 120px;
+}
+
+.scroll_button {
+    width: 400px;
+    flex-basis: 100px;
+    outline: 1px #6fa3ba solid;
+    outline-offset: 3px;
+    background-color: #6fa3ba;
+    z-index: 99999999999999;
+    position:absolute;
+    margin-top: 25%;
+    margin-left: 36%;
+    text-align: center;
+    line-height: 100px;
+}
+
+.render {
+    margin-left: 55vw;
+    margin-top: 8vh;
+    width: 100%;
+    height: 100%;
+    position:fixed;
+}
+
+.container {
+    flex-basis: 100vh;
+    width: 45%;
+    margin-left: 25vw;
+    margin-top: 10vh;
+    text-align: justify;
+    padding: 20px;
+    background-color: var(--dark-blue);
+    border-top: 10px var(--pink) solid;
+    border-bottom: 10px var(--pink) solid;
+    border-radius: 50px;
+    color: #fff;
+    box-shadow: 0 0.5px 1px #221a2a;
+    outline: 1px var(--blue) solid;
+    outline-offset: 3px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: absolute;
+}
+
+.sticky {
+    height: 50px;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    background-color: #6fa3ba;
+    position: fixed;
+    overflow: hidden;
+    z-index: 999999999999999999999;
+}
+
+.header {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    background-color: #222222;
+    z-index: 9999999;
+    top: 0;
+    right: 0;
+    left: 0;
+    position: absolute;
+}
+
+.header_img {
+    background-repeat: none;
+    width: 100%;
+    height: 98vh;
+    margin: 0;
+    overflow: hidden;
+    border-bottom: 20px solid #6fa3ba;
+    position: absolute;
+}
+
+.header_text {
+    font-size: 14px;
+    margin-top: 12px;
+    width: 100%;
+}
+
+.image_div {
+    height: 80%;
+}
+
+img.post {
+    width: 120px;
+}
+
+.title {
+    height: 5%;
+}
+
+.heading {
+    display: flex;
+    background-color: #F6F1F1;
+    color: black;
+    height: 17%;
+    align-items: center;
+}
+
+.contents {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    align-content: stretch;
+    align-items: start;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 250px;
+    flex-wrap: wrap;
+    color: #ffffff;
+}
+
+.chat {
+    width: 70%;
+    background-color: #146C94;
+    padding: 20px;
+}
+
+#chat-messages {
+    height: 90%;
+    overflow: scroll;
+}
+
+.chat-form {
+    height: 30px;
+}
+
+.user-list {
+    width: 30%;
+    background-color: #19A7CE;
+    padding: 20px;
+}
+
+.heading > div {
+    padding: 20px;
+}
+
+.post_header {
+    background-color: var(--pink); 
+    border-radius: 50px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-left: 1vw;
+    margin-right: 50vw;
+    display: flex;
+    position: relative;
+}
+
+.post_bg {
+    background-color: var(--blue);
+    margin-top: -32px;
+    padding: 30px;
+    border-radius: 40px;
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100px;
+    width: 40vw;
+}
+
+.post_content{
+    background-color: transparent;
+}
+
+.post_likes{
+    background-color: var(--pink);
+    color: white;
+    border-radius: 40px;
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
