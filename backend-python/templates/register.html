@@ -1,0 +1,62 @@
+{% extends 'index.html' %}
+
+{% block register %}
+<h1>Register: </h1>
+<div class="fixed">
+    <div class="flex-banner">
+        
+        <div class="reg-form">
+
+            <form id="register-form" action="{{ url_for('register') }}" method="post">
+                <span class="">Username:</span> 
+                <input class="" type="text" name="username" required maxlength="20" minlength="4"></input> <br></br> 
+                <span class="">Password:</span>
+                <input class="" type="password" name="password" required maxlength="40" minlength="6"></input> <br></br>
+
+                
+
+                <p id="reg-help">{{ feedback }}</p>
+                
+
+                <button class="button right">Register</button>
+                
+        
+            </form>
+
+            <br><br>
+
+            
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block login %}
+<h1>Login: </h1>
+<div class="fixed">
+    <div class="flex-banner">
+        
+        <div class="reg-form">
+
+            <form id="register-form" action="{{ url_for('login') }}" method="post">      
+                <span class="">Username:</span> 
+                <input class="" type="text" name="username" required maxlength="20" minlength="4"></input> <br></br> 
+                <span class="">Password:</span>
+                <input class="" type="password" name="password" required maxlength="40" minlength="6"></input> <br></br>
+
+                <p id="reg-help">{{ login_feedback }}</p>
+
+                <button class="button right">Login</button>
+                
+        
+            </form>
+
+            
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
