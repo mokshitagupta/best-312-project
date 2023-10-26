@@ -1,10 +1,14 @@
 import json
 
-from flask import Flask, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from werkzeug.utils import secure_filename
 from pymongo import MongoClient
-import bcrypt, random, html
+import bcrypt, random, html, os
 from db import *
+import datetime
 
+UPLOAD_FOLDER = './static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 class ConfigClass(object):
     # Flask settings
@@ -20,6 +24,23 @@ def create_app():
     @app.route('/')
     def home_page():
         # String-based templates
+        name = request.cookies.get('token')
+        if name == None:
+            # no auth token
+            return render_template('register.html')
+
+        salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
+        query = dbQuery("hash", salted, raw=True)
+        if len(query) == 0:
+            return render_template('register.html')
+
+        else:
+            exists, entry = getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
+            print(exists, entry)
+            return render_template('comments.html', username=entry["username"], username_hidden=entry["username"])
+        
+    @app.route('/create')
+    def create():
         name = request.cookies.get('token')
         if name == None:
             # no auth token
@@ -97,6 +118,10 @@ def create_app():
             return response
         else:
             return render_template('register.html')
+        
+    def allowed_file(filename):
+        return '.' in filename and \
+            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
     @app.route('/add-post', methods=["POST"])
     def addPost():
@@ -104,16 +129,35 @@ def create_app():
         title = form["title"]
         detail = form["detail"]
         username = form["username"]
+        img = request.files["image"]
+        filename = secure_filename(img.filename)
+        price = form["price"]
+        duration_hours = form["duration_hours"]
+        duration_minutes = form["duration_minutes"]
         name = request.cookies.get('token')
+        
+        duration = datetime.datetime.now() + datetime.timedelta(hours=int(duration_hours), minutes=int(duration_minutes))
+        
+        exists, entry = getUserEntry("path", "registeredUsers", username, all=True)
+        
+        if img and allowed_file(img.filename) and exists:
+            entry = {
+                "_id": increment(),
+                # "user_id": entry["_id"],
+                "username": html.escape(username),
+                "title": html.escape(title),
+                "detail": html.escape(detail),
+                "pic" : filename,
+                "price": html.escape(price),
+                "duration": duration.strftime("%m/%d/%Y %H:%M:%S"),
+                "winner": "",
+                "active": True,
+                "timestamp": datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S"),
+                "feature": "posts",
+                "likes": []
+            }
 
-        entry = {
-            "_id": increment(),
-            "title": html.escape(title),
-            "detail": html.escape(detail),
-            "username": html.escape(username),
-            "feature": "posts",
-            "likes": []
-        }
+            img.save(os.path.join(UPLOAD_FOLDER, filename))
 
         print(name, "nameeurd", getSalt())
 
@@ -126,6 +170,8 @@ def create_app():
 
         dbInsert(entry)
         comments = dbQuery("feature", "posts", all=True, raw=True)
+        
+        print("db: ", getDB())
 
         return redirect(request.referrer)
 

@@ -2,7 +2,12 @@
     --pink: #d4afb9;
     --blue: #9cadce;
     --dark-blue: #7286ad;
+    --aqua-blue: #50B2C0;
+    --deep-blue: #004360;
     --pale-pink: #f2e1e6;
+    --orange: #faaa8d;
+    --bg-shade: #201E1F;
+    --box-shadow: #221a2a;
 }
 
 /*scrollbar*/
@@ -12,8 +17,8 @@
 ::-webkit-scrollbar-track-piece {background:transparent;}
 
 body {
-    background-color: var(--blue);
-    background-image: url('bg.jpg');
+    background-color: var(--deep-blue);
+    /* background-image: url('bg.jpg'); */
     background-repeat: repeat;
     background-blend-mode: soft-light;
     color: white;
@@ -58,8 +63,15 @@ button:hover {
     background-color: var(--blue);
 }
 
-.my_image {
-    width: 120px;
+img[type="post"] {
+    height: 250px; 
+    width: auto;
+}
+
+img[type="post_prev"] {
+    height: 150px;
+    text-align: left;
+    margin-left: 140px;
 }
 
 .scroll_button {
@@ -84,19 +96,24 @@ button:hover {
     position:fixed;
 }
 
+.fixed {
+    margin-left: 25vw;
+    width: 35vw;
+}
+
 .container {
     flex-basis: 100vh;
-    width: 45%;
-    margin-left: 25vw;
+    width: 20%;
+    margin-left: 37vw;
     margin-top: 10vh;
     text-align: justify;
     padding: 20px;
-    background-color: var(--dark-blue);
-    border-top: 10px var(--pink) solid;
-    border-bottom: 10px var(--pink) solid;
+    background-color: var(--blue);
+    border-top: 10px var(--orange) solid;
+    border-bottom: 10px var(--orange) solid;
     border-radius: 50px;
     color: #fff;
-    box-shadow: 0 0.5px 1px #221a2a;
+    box-shadow: 0 0.5px 1px var(--box-shadow);
     outline: 1px var(--blue) solid;
     outline-offset: 3px;
     display: flex;
@@ -110,7 +127,7 @@ button:hover {
     width: 100%;
     top: 0px;
     left: 0px;
-    background-color: #6fa3ba;
+    background-color: var(--bg-shade);
     position: fixed;
     overflow: hidden;
     z-index: 999999999999999999999;
@@ -211,7 +228,7 @@ img.post {
     padding-left: 20px;
     padding-right: 20px;
     margin-left: 1vw;
-    margin-right: 50vw;
+    margin-right: 90vw;
     display: flex;
     position: relative;
 }
@@ -238,4 +255,31 @@ img.post {
     padding: 5px;
     padding-left: 20px;
     padding-right: 20px;
+}
+
+.post_prev {
+    width: 20vw;
+    height: 20vh;
+    background-color: var(--aqua-blue);
+    border-radius: 40px;
+    padding: 20px;
+}
+
+.post_prev_title {
+    font-size: 20px;
+}
+
+.post_prev_content {
+    font-size: 10px;
+}
+
+.comment_container {
+    margin-top: 10vh;
+    margin-left: 10vw;
+    width: 100%;
+}
+
+.comment_contents {
+    display: grid;
+    grid-template-rows: auto;
 }

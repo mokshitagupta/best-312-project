@@ -1,24 +1,31 @@
-{% extends 'index.html' %}
+{% extends 'homepage.html' %}
 
 {% block profile %}
 
-    
-
-    <h2>Welcome back {{username}}!</h2>
-
-    <h3>Make a post!</h3>
     <div class="fixed">
+
+        <h2>Welcome back {{username}}!</h2>
+        <h3>Make a post!</h3>
+
         <div class="flex-banner">
             
             <div class="reg-form">
-                <form id="register-form" action="{{ url_for('addPost') }}" method="post">
+                <form id="register-form" action="{{ url_for('addPost') }}" method="post" enctype="multipart/form-data">
                     <span class=""> Title:</span>
                     <input class="" type="text" name="title" required maxlength="20"></input> <br></br>
                     <span class=""> Description:</span> 
-                    <input class="" type="text" name="detail" required maxlength="120"></input> <br></br>
+                    <input class="" type="text" name="detail" required maxlength="500" height= "50px"></input> <br></br>
+                    <span class=""> Image:</span> 
+                    <input class="" type="file" name="image" required></input> <br></br>
+                    <span class=""> Starting Value:</span> 
+                    <input type="text" name="price" id="currency-field" pattern="^\$\d{1,3}(,\d{3})*(\.\d+)?$" value="" data-type="currency" placeholder="$1,000,000.00" required> <br></br>
+                    <span class=""> Duration:</span>
+                    <input class="" type="text" placeholder="Hours" name="duration_hours" required></input>
+                    <input class="" type="text" placeholder="Minutes" name="duration_minutes" required></input>
+                    <br></br>
                     <input class="" value="{{username_hidden}}" type="text" name="username" hidden></input> <br></br>
 
-                    <button  class="button right">Post</button>
+                    <button class="button right">Post</button>
                     
             
                 </form>
@@ -29,63 +36,6 @@
 
         </div>
     </div>
-    <h1> Comments</h1>
-
-    <div class="contents">
-        <div id="comments"></div>
-    </div>
-    
-    <script>
-
-        function sendToBrendan(id){
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "{{ url_for('likePost') }}");
-            xhttp.setRequestHeader("Content-type", "application/json");
-            xhttp.send(JSON.stringify(
-                {id:id}
-            ))
-        }
-
-        function poll(){
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("GET", "{{ url_for('getPosts') }}");
-            xhttp.onreadystatechange = function () {
-                if (this.readyState === 4 && this.status === 200) {
-                    const messages = JSON.parse(this.response);
-                    document.getElementById("comments").innerHTML = ""
-                    for (const message of messages) {
-                        document.getElementById("comments").innerHTML+= `<div class="post_header">${message.username}: </div>
-                        <p>
-                        <div class="post_bg"> <b>${message.title}</b>
-                            <div class="post_content">
-                                <br>
-                                <p>${message.detail}</p>
-                                <p>
-                                <span style="margin-top: 20px;"></span>
-                                <div class="post_likes">
-                                    ${message.likes.length}
-                                    <span style="padding-left: 50px;">
-                                        <button class="btn" onclick="sendToBrendan(${message._id})"> Like </button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <br>
-                        <key value=${message._id}></key>
-                        <br>
-                        <br>
-                        `
-                    }
-                }
-            };
-            xhttp.send();
-        }
-
-        setInterval(poll, 1000);
-        {#poll()#}
-        
-        
-    </script>
 
 {% endblock %}
 
