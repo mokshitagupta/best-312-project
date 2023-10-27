@@ -1,6 +1,7 @@
 import json
 
 from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 import bcrypt, random, html, os
@@ -212,4 +213,7 @@ def create_app():
 # Start development web server
 if __name__ == '__main__':
     app = create_app()
-    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    socketio = SocketIO(app)
+    # socketio.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    socketio.run(app, port=8080, host='0.0.0.0', debug=True)
+

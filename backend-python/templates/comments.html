@@ -60,11 +60,12 @@
             xhttp.send();
         }
 
-        setInterval(poll, 1000);
-        {#poll()#}
+        // setInterval(poll, 1000);
+        // {#poll()#}
         
     </script>
-
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    
     <script>
 
         // Jquery Dependency
@@ -153,6 +154,9 @@
         }
 
     </script>    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+    <script src="static/comments.js"></script>
 
 
 {% endblock %}
