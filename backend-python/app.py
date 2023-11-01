@@ -8,7 +8,7 @@ import bcrypt, random, html, os
 from db import *
 import datetime
 
-UPLOAD_FOLDER = './static/uploads'
+UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 class ConfigClass(object):
@@ -20,6 +20,22 @@ def create_app():
     # Setup Flask and load app.config
     app = Flask(__name__)
     app.config.from_object(__name__ + '.ConfigClass')
+    socketio = SocketIO(app)
+
+    @socketio.on('time')
+    def handle_message(data):
+        id = data["id"]
+        entry = dbQuery("_id", id, all=False, raw=True)
+
+        #this is probably where the post auction clean up code will need to be added for LO3
+        if len(entry) > 0:
+            rem =  datetime.datetime.strptime(entry["duration"], "%m/%d/%Y %H:%M:%S") - datetime.datetime.now()
+            retTime = int(rem.total_seconds())
+            if retTime < 0:
+                dbUpdate(id, {"active":False})
+            return retTime
+        else:
+            return -1
 
     # The Home page is accessible to anyone
     @app.route('/')
@@ -158,7 +174,7 @@ def create_app():
                 "likes": []
             }
 
-            img.save(os.path.join(UPLOAD_FOLDER, filename))
+            img.save(os.path.join(app.root_path, UPLOAD_FOLDER, filename))
 
         print(name, "nameeurd", getSalt())
 
@@ -207,13 +223,24 @@ def create_app():
             dbUpdate(postID, updateVal)
             return ""
 
-    return app
+    @app.route('/post/<int:Number>')
+    def allow(Number):
+        entry = dbQuery("_id", Number, all=False, raw=True)
+        print(entry)
+        if len(entry) > 0:
+            return render_template('auction.html', img ="/static/uploads/"+entry["pic"],title=entry["title"],
+                                    creator=entry["username"], id=Number, description=entry["detail"],
+                                    price=entry["price"])
+        else:
+            return "Auction not found :("
+
+    return app, socketio
 
 
 # Start development web server
 if __name__ == '__main__':
-    app = create_app()
-    socketio = SocketIO(app)
-    # socketio.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    app, socketio = create_app()
+    
     socketio.run(app, port=8080, host='0.0.0.0', debug=True)
+    
 

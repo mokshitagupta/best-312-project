@@ -25,43 +25,30 @@
             xhttp.open("GET", "{{ url_for('getPosts') }}");
             xhttp.onreadystatechange = function () {
                 if (this.readyState === 4 && this.status === 200) {
+                    console.log(this.response)
                     const messages = JSON.parse(this.response);
                     document.getElementById("comments").innerHTML = ""
                     for (const message of messages) {
-                        document.getElementById("comments").innerHTML+= `<!-- <div class="post_header">${message.username}: </div> -->
-                        <p>
+                        document.getElementById("comments").innerHTML+= `
+                        <a href ="/post/${message._id}">
                         <div class="post_prev">
+                            <key class="invisible" value=${message._id}></key>
                             <div class="post_prev_content">
                                 <div class="post_prev_title">${message.title}</div>
-                                <!-- <p>value: ${message.price}</p>
-                                <p> -->
                                 <img src="/static/uploads/${message.pic}" type="post_prev"></img>
-                                <br>
-                                <p>
-                                <!-- <p>bid started: ${message.timestamp}</p>
-                                <p>bid duration: ${message.duration}</p>
-                                <span style="margin-top: 20px;"></span>
-                                <div class="post_likes">
-                                    ${message.likes.length}
-                                    <span style="padding-left: 50px;">
-                                        <button class="btn" onclick="sendToBrendan(${message._id})"> Like </button>
-                                    </span>
-                                </div> -->
                             </div>
                         </div>
-                        <br>
-                        <key value=${message._id}></key>
-                        <br>
-                        <br>
+                        </a>
+                        
                         `
                     }
                 }
             };
             xhttp.send();
         }
-
-        // setInterval(poll, 1000);
-        // {#poll()#}
+        
+        poll()
+        setInterval(poll, 5000);
         
     </script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -154,9 +141,6 @@
         }
 
     </script>    
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-    <script src="static/comments.js"></script>
 
 
 {% endblock %}

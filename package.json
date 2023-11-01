@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-router-dom": "^6.16.0"
   }
