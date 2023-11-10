@@ -48,6 +48,32 @@ function getAuctionTime(id){
 function submitBid(id){
     
     let bid = document.getElementById("user-bid").value
+    // socket.emit("submit_bid", { bid: user-bid, post_id: id })
     console.log(id, bid)
+
+    socket.emit("submitBid",  { bid: bid, _id: id }, (data) => {
+        //do something
+        console.log(data)
+
+        let result = data.updated
+
+        let highest = document.getElementById("highest")
+        let winner = document.getElementById("winner")
+        let feedback = document.getElementById("bid-result")
+        if (result == false){
+            feedback.innerText = "Bid not accepted :( Try Higher!"
+            highest.innerText = data.bid
+            winner.innerText = data.winner
+
+        } else if (result == true){
+            feedback.innerText = "Woah, bid accepted! You're one step closer to getting this!"
+            highest.innerText = data.bid
+            winner.innerText = data.winner
+
+        } else if (result == "redirect"){
+            // window.location.href = "/"
+            console.log("redirect")
+        }
+    })
 }
 

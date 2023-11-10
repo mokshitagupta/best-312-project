@@ -7,7 +7,7 @@
     <title>Bid Big Auction</title>
 </head>
 <body>
-    <h3>Time remaining: <span id="time"></span> </h3> 
+    <h3>Time remaining: <span id="time"></span> </h3>
     <h1> {{title}} </h1>
     <h2> {{description}}</h3>
     <h3> Created by: {{creator}}</h2>
@@ -17,12 +17,14 @@
     
     <img class="auc-pic" src="{{img}}">
     <h2>All Bids</h3>
-    <h3>Current highest bid: <span id="highest">0</span></h3>
+    <h3>Current highest bid: <span id="highest">{{curr_highest}}</span></h3>
+    <h2>By: <span id="winner">{{winner}}</span></h2>
     <form>
         <label for="user-bid">Submit a bid:</label>
         <input min="0" max="999999999999999999999999" id="user-bid" type="number"></input>
         <p>Input is limited to numbers only!</p>
         <button onclick="submitBid({{id}})" type="button">Bid Big!</button>
+        <p id="bid-result"></p>
     </form>
     
     

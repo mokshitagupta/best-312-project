@@ -36,6 +36,47 @@ def create_app():
             return retTime
         else:
             return -1
+        
+    @socketio.on('submitBid')
+    def submit_bid(data):
+        #data -> post id
+        print('\n\nON SUBMIT BID PATH\\n\n')
+        entry = dbQuery("_id", data["_id"], all=False, raw=True)
+        try:
+            bid = int(data["bid"])
+        except:
+            bid = 0
+
+        #verification
+        name = request.cookies.get('token')
+        print("########################")
+        print("-------DEBUG------")
+        print("user token:", name)
+        print("-------DEBUG------")
+        if name == None:
+            # no auth token
+            return "redirect from no token"
+
+        salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
+        query = dbQuery("hash", salted, raw=True)
+        if len(query) == 0:
+            return "redirect from incorrect"
+
+        else:
+            exists, userinfo = getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
+            print(exists, entry, userinfo, bid)
+
+            if "highestBid" not in entry:
+                print("sorry that you have to grade this :( love u <3")
+                
+            elif bid > entry["highestBid"]:
+                # id: id instead of the {'highestBid': {"$exists" : False}}
+                dbUpdate( data["_id"], {"highestBid":bid})
+                dbUpdate( data["_id"], {"winner":userinfo["username"]})
+                return {"updated":True, "bid":bid, "winner":userinfo["username"]}
+                
+            else:
+                return {"updated":False, "bid":entry["highestBid"], "winner":entry["winner"]}
 
     # The Home page is accessible to anyone
     @app.route('/')
@@ -171,7 +212,8 @@ def create_app():
                 "active": True,
                 "timestamp": datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S"),
                 "feature": "posts",
-                "likes": []
+                "likes": [],
+                "highestBid":0,
             }
 
             img.save(os.path.join(app.root_path, UPLOAD_FOLDER, filename))
@@ -226,21 +268,29 @@ def create_app():
     @app.route('/post/<int:Number>')
     def allow(Number):
         entry = dbQuery("_id", Number, all=False, raw=True)
-        print(entry)
+        
         if len(entry) > 0:
+            print(entry)
+            winner = entry["winner"]
+            if winner == "":
+                winner = "No bids yet :("
             return render_template('auction.html', img ="/static/uploads/"+entry["pic"],title=entry["title"],
                                     creator=entry["username"], id=Number, description=entry["detail"],
-                                    price=entry["price"])
+                                    price=entry["price"], curr_highest=entry["highestBid"], winner=winner)
         else:
             return "Auction not found :("
+    
+    
 
     return app, socketio
+
+    
 
 
 # Start development web server
 if __name__ == '__main__':
     app, socketio = create_app()
     
-    socketio.run(app, port=8080, host='0.0.0.0', debug=True)
+    socketio.run(app, port=8080, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
     
 
