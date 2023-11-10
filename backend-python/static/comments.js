@@ -71,7 +71,7 @@ function submitBid(id){
             winner.innerText = data.winner
 
         } else if (result == "redirect"){
-            // window.location.href = "/"
+            window.location.href = "/"
             console.log("redirect")
         }
     })
