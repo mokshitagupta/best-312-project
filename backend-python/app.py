@@ -40,7 +40,6 @@ def create_app():
     @socketio.on('submitBid')
     def submit_bid(data):
         #data -> post id
-        print('\n\nON SUBMIT BID PATH\\n\n')
         entry = dbQuery("_id", data["_id"], all=False, raw=True)
         try:
             bid = int(data["bid"])
@@ -49,31 +48,33 @@ def create_app():
 
         #verification
         name = request.cookies.get('token')
-        print("########################")
-        print("-------DEBUG------")
-        print("user token:", name)
-        print("-------DEBUG------")
+       
         if name == None:
             # no auth token
-            return "redirect from no token"
+            return {"updated":"redirect"}
 
         salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
         query = dbQuery("hash", salted, raw=True)
         if len(query) == 0:
-            return "redirect from incorrect"
+            return {"updated":"redirect"}
 
         else:
+
+
             exists, userinfo = getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
             print(exists, entry, userinfo, bid)
 
-            if "highestBid" not in entry:
-                print("sorry that you have to grade this :( love u <3")
-                
-            elif bid > entry["highestBid"]:
-                # id: id instead of the {'highestBid': {"$exists" : False}}
-                dbUpdate( data["_id"], {"highestBid":bid})
-                dbUpdate( data["_id"], {"winner":userinfo["username"]})
-                return {"updated":True, "bid":bid, "winner":userinfo["username"]}
+            if entry["active"] == True:
+                if "highestBid" not in entry:
+                    print("sorry that you have to grade this :( love u <3")
+
+
+                    
+                elif bid > entry["highestBid"]:
+                    # id: id instead of the {'highestBid': {"$exists" : False}}
+                    dbUpdate( data["_id"], {"highestBid":bid})
+                    dbUpdate( data["_id"], {"winner":userinfo["username"]})
+                    return {"updated":True, "bid":bid, "winner":userinfo["username"]}
                 
             else:
                 return {"updated":False, "bid":entry["highestBid"], "winner":entry["winner"]}
