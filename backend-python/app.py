@@ -33,6 +33,7 @@ def create_app():
             retTime = int(rem.total_seconds())
             if retTime < 0:
                 dbUpdate(id, {"active":False})
+                dbUpdate(id, {"finalWinner": entry["winner"]})
             return retTime
         else:
             return -1
@@ -210,6 +211,7 @@ def create_app():
                 "price": html.escape(price),
                 "duration": duration.strftime("%m/%d/%Y %H:%M:%S"),
                 "winner": "",
+                "finalWinner": "N/A (Auction still active)",
                 "active": True,
                 "timestamp": datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S"),
                 "feature": "posts",
