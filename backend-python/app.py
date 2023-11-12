@@ -1,13 +1,14 @@
 import json
 
 from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 import bcrypt, random, html, os
 from db import *
 import datetime
 
-UPLOAD_FOLDER = './static/uploads'
+UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 class ConfigClass(object):
@@ -19,6 +20,65 @@ def create_app():
     # Setup Flask and load app.config
     app = Flask(__name__)
     app.config.from_object(__name__ + '.ConfigClass')
+    socketio = SocketIO(app)
+
+    @socketio.on('time')
+    def handle_message(data):
+        id = data["id"]
+        entry = dbQuery("_id", id, all=False, raw=True)
+
+        #this is probably where the post auction clean up code will need to be added for LO3
+        if len(entry) > 0:
+            rem =  datetime.datetime.strptime(entry["duration"], "%m/%d/%Y %H:%M:%S") - datetime.datetime.now()
+            retTime = int(rem.total_seconds())
+            if retTime < 0:
+                dbUpdate(id, {"active":False})
+                dbUpdate(id, {"finalWinner": entry["winner"]})
+            return retTime
+        else:
+            return -1
+        
+    @socketio.on('submitBid')
+    def submit_bid(data):
+        #data -> post id
+        entry = dbQuery("_id", data["_id"], all=False, raw=True)
+        try:
+            bid = int(data["bid"])
+        except:
+            bid = 0
+
+        #verification
+        name = request.cookies.get('token')
+       
+        if name == None:
+            # no auth token
+            return {"updated":"redirect"}
+
+        salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
+        query = dbQuery("hash", salted, raw=True)
+        if len(query) == 0:
+            return {"updated":"redirect"}
+
+        else:
+
+
+            exists, userinfo = getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
+            print(exists, entry, userinfo, bid)
+
+            if entry["active"] == True:
+                if "highestBid" not in entry:
+                    print("sorry that you have to grade this :( love u <3")
+
+
+                    
+                elif bid > entry["highestBid"]:
+                    # id: id instead of the {'highestBid': {"$exists" : False}}
+                    dbUpdate( data["_id"], {"highestBid":bid})
+                    dbUpdate( data["_id"], {"winner":userinfo["username"]})
+                    return {"updated":True, "bid":bid, "winner":userinfo["username"]}
+                
+            else:
+                return {"updated":False, "bid":entry["highestBid"], "winner":entry["winner"]}
 
     # The Home page is accessible to anyone
     @app.route('/')
@@ -151,13 +211,15 @@ def create_app():
                 "price": html.escape(price),
                 "duration": duration.strftime("%m/%d/%Y %H:%M:%S"),
                 "winner": "",
+                "finalWinner": "N/A (Auction still active)",
                 "active": True,
                 "timestamp": datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S"),
                 "feature": "posts",
-                "likes": []
+                "likes": [],
+                "highestBid":0,
             }
 
-            img.save(os.path.join(UPLOAD_FOLDER, filename))
+            img.save(os.path.join(app.root_path, UPLOAD_FOLDER, filename))
 
         print(name, "nameeurd", getSalt())
 
@@ -228,12 +290,33 @@ def create_app():
         else:
             createdPosts = dbQuery("username", username, all=True, raw=True)
             return json.dumps(createdPosts)
-        pass
 
-    return app
+    @app.route('/post/<int:Number>')
+    def allow(Number):
+        entry = dbQuery("_id", Number, all=False, raw=True)
+        
+        if len(entry) > 0:
+            print(entry)
+            winner = entry["winner"]
+            if winner == "":
+                winner = "No bids yet :("
+            return render_template('auction.html', img ="/static/uploads/"+entry["pic"],title=entry["title"],
+                                    creator=entry["username"], id=Number, description=entry["detail"],
+                                    price=entry["price"], curr_highest=entry["highestBid"], winner=winner)
+        else:
+            return "Auction not found :("
+    
+    
+
+    return app, socketio
+
+
 
 
 # Start development web server
 if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    app, socketio = create_app()
+    
+    socketio.run(app, port=8080, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
+    
+

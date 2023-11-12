@@ -126,7 +126,7 @@ def dbDelete(val):
 def dbClean():
     dbname = getDB()
     collection_name = dbname["user_1_items"]
-    collection_name.delete_many({"feature":"sessionToken"})
+    collection_name.delete_many({"feature":"posts"})
     # collection_name.delete_many({"feature":"img_count"})
     increment(img=True)
 
@@ -165,3 +165,6 @@ def insertSessionId(hash, username):
     }
 
     dbInsert(entry)
+
+
+# dbClean()
