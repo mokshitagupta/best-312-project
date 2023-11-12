@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for, jsonify
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
@@ -282,12 +282,25 @@ def create_app():
                                     price=entry["price"], curr_highest=entry["highestBid"], winner=winner)
         else:
             return "Auction not found :("
+        
+    @app.route('/user_dashboard')
+    def user_dashboard():
+        return render_template('user.html')
     
+    auction_history = [
+    {"item_id": 1, "bid": 100, "bidder": "UserA"},
+    {"item_id": 2, "bid": 150, "bidder": "UserB"},
+    # More auction history data...
+]
+
+    @app.route('/auction-history')
+    def get_auction_history():
+        return jsonify(auction_history)
     
 
     return app, socketio
 
-    
+
 
 
 # Start development web server

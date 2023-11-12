@@ -16,6 +16,7 @@
         <table style="margin-left: auto;">
             <tr>
                 <th> <a href="/">Dashboard.</a></th>
+                <th><a href="/user_dashboard">User</a></th>
                 <th><a href="/create">Create.</a></th>
             </tr>
         </table>
@@ -23,6 +24,9 @@
 </div>
 
     {% block profile %}
+    {% endblock %}
+
+    {% block user %}
     {% endblock %}
 
     {% block comments %}

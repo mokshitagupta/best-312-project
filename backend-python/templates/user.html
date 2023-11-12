@@ -1,0 +1,43 @@
+{% extends 'homepage.html' %}
+
+{% block user %}
+
+<div class="row">
+    <div class="column middle" style="background-color:#142d4c;">
+      <h2>Auction Won</h2>
+      <div id="auction-history">
+        <!-- Auction history will be loaded here -->
+    </div>
+    </div>
+    <div class="column right" style="background-color:#a2a8d3;">
+      <h2>Auction Created</h2>
+      <p>Some text..</p>
+    </div>
+
+    <!-- Auction History Section -->
+    <div class="column" style="background-color:#d52626;">
+        <h2>Auction History</h2>
+
+    </div>
+</div>
+
+<script>
+    // JavaScript function to update auction history
+    function updateAuctionHistory() {
+        fetch('/auction-history')
+            .then(response => response.json())
+            .then(data => {
+                const historyElement = document.getElementById('auction-history');
+                historyElement.innerHTML = ''; // Clear existing content
+
+                data.forEach(entry => {
+                    historyElement.innerHTML += `<div class="auction-entry">Auction Item ${entry.item_id}: $${entry.bid} by ${entry.bidder}</div>`;
+                });
+            });
+    }
+
+    // Call the function on page load
+    updateAuctionHistory();
+</script>
+
+{% endblock %}
