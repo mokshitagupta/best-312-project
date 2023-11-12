@@ -240,6 +240,7 @@ def create_app():
     @app.route('/get-posts', methods=["GET"])
     def getPosts():
         comments = dbQuery("feature", "posts", all=True, raw=True)
+        print(f"Posts:\n{json.dumps(comments)}")
         return json.dumps(comments)
 
     @app.route('/like', methods=["POST"])
