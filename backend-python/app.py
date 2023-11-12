@@ -177,7 +177,6 @@ def create_app():
 
     @app.route('/get-posts', methods=["GET"])
     def getPosts():
-
         comments = dbQuery("feature", "posts", all=True, raw=True)
         return json.dumps(comments)
 
@@ -205,6 +204,31 @@ def create_app():
             updateVal = {"likes": likesUpdater}
             dbUpdate(postID, updateVal)
             return ""
+
+    @app.route('/auctions-won', methods=["GET"])
+    def getPostsWon():
+        authToken = request.cookies.get('token')
+        salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
+        userDocument = dbQuery("hash", salted, raw=True)[0]
+        username = userDocument["username"]
+        if len(userDocument) == 0:
+            return redirect(request.referrer), 403
+        else:
+            wonPosts = dbQuery("winner", username, all=True, raw=True)
+            return json.dumps(wonPosts)
+
+    @app.route('/auctions-created', methods=["GET"])
+    def getPostsCreated():
+        authToken = request.cookies.get('token')
+        salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
+        userDocument = dbQuery("hash", salted, raw=True)[0]
+        username = userDocument["username"]
+        if len(userDocument) == 0:
+            return redirect(request.referrer), 403
+        else:
+            createdPosts = dbQuery("username", username, all=True, raw=True)
+            return json.dumps(createdPosts)
+        pass
 
     return app
 
