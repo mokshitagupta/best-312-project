@@ -285,11 +285,16 @@ def create_app():
         salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
         userDocument = dbQuery("hash", salted, raw=True)[0]
         username = userDocument["username"]
+        print(f"username = {username}")
         if len(userDocument) == 0:
             return redirect(request.referrer), 403
         else:
-            createdPosts = dbQuery("username", username, all=True, raw=True)
-            return jsonify(createdPosts)
+            createdPosts = dbQuery("feature", "posts", all=True, raw=True)
+            for i in createdPosts:
+              if i["username"] != username:
+                  createdPosts.remove(i)
+            print(f"created posts:/n{createdPosts}")
+            return json.dumps(createdPosts)
 
     @app.route('/post/<int:Number>')
     def allow(Number):
