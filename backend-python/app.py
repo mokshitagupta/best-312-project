@@ -1,10 +1,15 @@
 import json
 
-from flask import Flask, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from flask_socketio import SocketIO
+from werkzeug.utils import secure_filename
 from pymongo import MongoClient
-import bcrypt, random, html
+import bcrypt, random, html, os
 from db import *
+import datetime
 
+UPLOAD_FOLDER = 'static/uploads'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 class ConfigClass(object):
     # Flask settings
@@ -15,11 +20,87 @@ def create_app():
     # Setup Flask and load app.config
     app = Flask(__name__)
     app.config.from_object(__name__ + '.ConfigClass')
+    socketio = SocketIO(app)
+
+    @socketio.on('time')
+    def handle_message(data):
+        id = data["id"]
+        entry = dbQuery("_id", id, all=False, raw=True)
+
+        #this is probably where the post auction clean up code will need to be added for LO3
+        if len(entry) > 0:
+            rem =  datetime.datetime.strptime(entry["duration"], "%m/%d/%Y %H:%M:%S") - datetime.datetime.now()
+            retTime = int(rem.total_seconds())
+            if retTime < 0:
+                dbUpdate(id, {"active":False})
+                dbUpdate(id, {"finalWinner": entry["winner"]})
+            return retTime
+        else:
+            return -1
+        
+    @socketio.on('submitBid')
+    def submit_bid(data):
+        #data -> post id
+        entry = dbQuery("_id", data["_id"], all=False, raw=True)
+        try:
+            bid = int(data["bid"])
+        except:
+            bid = 0
+
+        #verification
+        name = request.cookies.get('token')
+       
+        if name == None:
+            # no auth token
+            return {"updated":"redirect"}
+
+        salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
+        query = dbQuery("hash", salted, raw=True)
+        if len(query) == 0:
+            return {"updated":"redirect"}
+
+        else:
+
+
+            exists, userinfo = getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
+            print(exists, entry, userinfo, bid)
+
+            if entry["active"] == True:
+                if "highestBid" not in entry:
+                    print("sorry that you have to grade this :( love u <3")
+
+
+                    
+                elif bid > entry["highestBid"]:
+                    # id: id instead of the {'highestBid': {"$exists" : False}}
+                    dbUpdate( data["_id"], {"highestBid":bid})
+                    dbUpdate( data["_id"], {"winner":userinfo["username"]})
+                    return {"updated":True, "bid":bid, "winner":userinfo["username"]}
+                
+            else:
+                return {"updated":False, "bid":entry["highestBid"], "winner":entry["winner"]}
 
     # The Home page is accessible to anyone
     @app.route('/')
     def home_page():
         # String-based templates
+        name = request.cookies.get('token')
+        if name == None:
+            # no auth token
+            return render_template('register.html')
+
+        salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
+        query = dbQuery("hash", salted, raw=True)
+        if len(query) == 0:
+            return render_template('register.html')
+
+        else:
+            exists, entry = getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
+            print(exists, entry)
+            return render_template('comments.html', username=entry["username"], username_hidden=entry["username"])
+        
+    @app.route('/create')
+    def create():
         name = request.cookies.get('token')
         if name == None:
             # no auth token
@@ -97,6 +178,10 @@ def create_app():
             return response
         else:
             return render_template('register.html')
+        
+    def allowed_file(filename):
+        return '.' in filename and \
+            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
     @app.route('/add-post', methods=["POST"])
     def addPost():
@@ -104,16 +189,37 @@ def create_app():
         title = form["title"]
         detail = form["detail"]
         username = form["username"]
+        img = request.files["image"]
+        filename = secure_filename(img.filename)
+        price = form["price"]
+        duration_hours = form["duration_hours"]
+        duration_minutes = form["duration_minutes"]
         name = request.cookies.get('token')
+        
+        duration = datetime.datetime.now() + datetime.timedelta(hours=int(duration_hours), minutes=int(duration_minutes))
+        
+        exists, entry = getUserEntry("path", "registeredUsers", username, all=True)
+        
+        if img and allowed_file(img.filename) and exists:
+            entry = {
+                "_id": increment(),
+                # "user_id": entry["_id"],
+                "username": html.escape(username),
+                "title": html.escape(title),
+                "detail": html.escape(detail),
+                "pic" : filename,
+                "price": html.escape(price),
+                "duration": duration.strftime("%m/%d/%Y %H:%M:%S"),
+                "winner": "",
+                "finalWinner": "N/A (Auction still active)",
+                "active": True,
+                "timestamp": datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S"),
+                "feature": "posts",
+                "likes": [],
+                "highestBid":0,
+            }
 
-        entry = {
-            "_id": increment(),
-            "title": html.escape(title),
-            "detail": html.escape(detail),
-            "username": html.escape(username),
-            "feature": "posts",
-            "likes": []
-        }
+            img.save(os.path.join(app.root_path, UPLOAD_FOLDER, filename))
 
         print(name, "nameeurd", getSalt())
 
@@ -126,6 +232,8 @@ def create_app():
 
         dbInsert(entry)
         comments = dbQuery("feature", "posts", all=True, raw=True)
+        
+        print("db: ", getDB())
 
         return redirect(request.referrer)
 
@@ -160,10 +268,32 @@ def create_app():
             dbUpdate(postID, updateVal)
             return ""
 
-    return app
+    @app.route('/post/<int:Number>')
+    def allow(Number):
+        entry = dbQuery("_id", Number, all=False, raw=True)
+        
+        if len(entry) > 0:
+            print(entry)
+            winner = entry["winner"]
+            if winner == "":
+                winner = "No bids yet :("
+            return render_template('auction.html', img ="/static/uploads/"+entry["pic"],title=entry["title"],
+                                    creator=entry["username"], id=Number, description=entry["detail"],
+                                    price=entry["price"], curr_highest=entry["highestBid"], winner=winner)
+        else:
+            return "Auction not found :("
+    
+    
+
+    return app, socketio
+
+    
 
 
 # Start development web server
 if __name__ == '__main__':
-    app = create_app()
-    app.run(host='0.0.0.0', port=8080, debug=True, threaded=True)
+    app, socketio = create_app()
+    
+    socketio.run(app, port=8080, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
+    
+

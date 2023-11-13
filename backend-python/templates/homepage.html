@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}"/>
+    <title>Bid Big!</title>
+
+</head>
+<body>
+
+<div id="App">
+
+<div class="sticky">
+    <div class="header_text">
+        <table style="margin-left: auto;">
+            <tr>
+                <th> <a href="/">Dashboard.</a></th>
+                <th><a href="/create">Create.</a></th>
+            </tr>
+        </table>
+    </div>
+</div>
+
+    {% block profile %}
+    {% endblock %}
+
+    {% block comments %}
+    {% endblock %}
+
+</div>
+</body>
+</html>
