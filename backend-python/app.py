@@ -1,6 +1,6 @@
 import json
 
-from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for
+from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for, jsonify
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
@@ -239,7 +239,6 @@ def create_app():
 
     @app.route('/get-posts', methods=["GET"])
     def getPosts():
-
         comments = dbQuery("feature", "posts", all=True, raw=True)
         return json.dumps(comments)
 
@@ -268,6 +267,42 @@ def create_app():
             dbUpdate(postID, updateVal)
             return ""
 
+    @app.route('/auctions-won', methods=["GET"])
+    def getPostsWon():
+        authToken = request.cookies.get('token')
+        if authToken:
+            salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
+            userDocument = dbQuery("hash", salted, raw=True)[0]
+            username = userDocument["username"]
+            print(f"username = {username}")
+            if len(userDocument) == 0:
+                return redirect(request.referrer), 403
+            else:
+                createdPosts = dbQuery("feature", "posts", all=True, raw=True)
+                for i in createdPosts:
+                    if i["finalWinner"] != username:
+                        createdPosts.remove(i)
+                print(f"created posts:/n{createdPosts}")
+                return json.dumps(createdPosts)
+
+    @app.route('/auctions-created', methods=["GET"])
+    def getPostsCreated():
+        authToken = request.cookies.get('token')
+        if authToken:
+            salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
+            userDocument = dbQuery("hash", salted, raw=True)[0]
+            username = userDocument["username"]
+            print(f"username = {username}")
+            if len(userDocument) == 0:
+                return redirect(request.referrer), 403
+            else:
+                createdPosts = dbQuery("feature", "posts", all=True, raw=True)
+                for i in createdPosts:
+                    if i["username"] != username:
+                        createdPosts.remove(i)
+                print(f"created posts:/n{createdPosts}")
+                return json.dumps(createdPosts)
+
     @app.route('/post/<int:Number>')
     def allow(Number):
         entry = dbQuery("_id", Number, all=False, raw=True)
@@ -282,12 +317,21 @@ def create_app():
                                     price=entry["price"], curr_highest=entry["highestBid"], winner=winner)
         else:
             return "Auction not found :("
+        
+    @app.route('/user_dashboard')
+    def user_dashboard():
+        return render_template('user.html')
     
     
+    @app.route('/logout')
+    def logout():
+        resplog = make_response(redirect('/'))  
+        resplog.set_cookie('token', '', expires=0) 
+        return resplog
 
     return app, socketio
 
-    
+
 
 
 # Start development web server
@@ -295,5 +339,11 @@ if __name__ == '__main__':
     app, socketio = create_app()
     
     socketio.run(app, port=8080, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
+    
+
+     
+
+    
+
     
 
