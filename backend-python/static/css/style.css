@@ -332,26 +332,15 @@ key {
 }
   
 
+.row {
+    display: flex;
+  }
+  
 .column {
-    margin-top: 5%;
-    float: left;
+    margin-top: 2%;
+    flex: 50%;
     padding: 10px;
-    height: 100%;
-  }
-  
-.left {
-    width: 40%;
-  }
-  
-.middle, .right {
-    width: 30%;
-}
-  
-  /* Clear floats after the columns */
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
+    height: 300px; /* Should be removed. Only for demonstration */
 }
 
 @media screen and (max-width: 600px) {
