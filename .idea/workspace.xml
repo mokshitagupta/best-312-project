@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="323dff7d-dda9-4048-a0a5-5cec350208d6" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend-python/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend-python/app.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend-python/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend-python/db.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,30 +57,16 @@
       <workItem from="1699482715346" duration="1600000" />
       <workItem from="1699541856232" duration="2343000" />
       <workItem from="1699799776355" duration="7313000" />
+      <workItem from="1699855588275" duration="52000" />
+      <workItem from="1699856123468" duration="402000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend-python/app.py</url>
-          <line>296</line>
-          <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend-python/app.py</url>
-          <line>292</line>
-          <option name="timeStamp" value="8" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/best_312_project$app.coverage" NAME="app Coverage Results" MODIFIED="1699854471467" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend-python" />
-    <SUITE FILE_PATH="coverage/best_312_project$db.coverage" NAME="db Coverage Results" MODIFIED="1699853039152" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend-python" />
+    <SUITE FILE_PATH="coverage/best_312_project$app.coverage" NAME="app Coverage Results" MODIFIED="1699855214209" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend-python" />
+    <SUITE FILE_PATH="coverage/best_312_project$db.coverage" NAME="db Coverage Results" MODIFIED="1699856159350" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/backend-python" />
   </component>
 </project>
