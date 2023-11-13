@@ -276,7 +276,7 @@ def create_app():
         if len(userDocument) == 0:
             return redirect(request.referrer), 403
         else:
-            wonPosts = dbQuery("winner", username, all=True, raw=True)
+            wonPosts = dbQuery("winner", username, all=True, raw=True)[0]
             return json.dumps(wonPosts)
 
     @app.route('/auctions-created', methods=["GET"])
@@ -323,7 +323,8 @@ def create_app():
 
     @app.route('/auction-history')
     def get_auction_history():
-        return jsonify(auction_history)
+        return_val = getPostsWon()
+        return return_val
     
     @app.route('/logout')
     def logout():
