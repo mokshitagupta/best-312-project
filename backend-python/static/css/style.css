@@ -340,11 +340,27 @@ key {
     margin-top: 2%;
     flex: 50%;
     padding: 10px;
-    height: 300px; /* Should be removed. Only for demonstration */
+    height: 100%; 
 }
 
 @media screen and (max-width: 600px) {
     .column {
       width: 100%;
     }
+}
+
+.card {
+    margin: 10px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 40%;
+    background-color: #524c4d;
+}
+  
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+  
+.container4 {
+    padding: 2px 16px;
 }

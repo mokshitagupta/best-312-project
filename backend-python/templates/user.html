@@ -5,7 +5,7 @@
 <div class="row">
     <div class="column middle" style="background-color:#142d4c;">
         <h2>Auction Won</h2>
-        <div id="auction-history">
+        <div id="auction-won">
             <!-- Auction history will be loaded here -->
         </div>
     </div>
@@ -20,15 +20,26 @@
 <script>
     // JavaScript function to update auction history
     function updateAuctionHistory() {
-        fetch('/auction-history')
+        fetch('/auctions-won')
             .then(response => response.json())
             .then(data => {
-                const historyElement = document.getElementById('auction-history');
-                historyElement.innerHTML = ''; // Clear existing content
+                const historyElement = document.getElementById('auction-won');
+                historyElement.innerHTML = ''; 
 
                 data.forEach(entry => {
-                    historyElement.innerHTML += `<div class="auction-entry">Auction Item ${entry.item_id}: $${entry.bid} by ${entry.bidder}</div>`;
+                    historyElement.innerHTML += `
+                        <div class="card">
+                            <img src="/static/uploads/${entry.pic}" type="post_prev"></img>
+                            <div class="container4">
+                                <h4><b>Title: ${entry.title}</b></h4> 
+                                <p> Description: ${entry.detail} </p>
+                                <p>price : ${entry.price}</p>
+                                <p>The Winner: ${entry.finalWinner}</p>
+                            </div>
+                        </div>
+                    `;
                 });
+                
             });
     }
     function auctionCreated() {
@@ -37,12 +48,22 @@
             .then(data => {
                 console.log("data: ", data)
                 const createdElement = document.getElementById('auctions-created');
-                createdElement.innerHTML = ''; // Clear existing content
+                createdElement.innerHTML = ''; 
 
                 data.forEach(post => {
                     console.log("post", post)
                     // Update the following line if the structure of 'post' is different
-                    createdElement.innerHTML += `<div><strong>${post.title}</strong>: ${post.detail}</div>`;
+                    createdElement.innerHTML += `
+                        <div class="card">
+                            <img src="/static/uploads/${post.pic}" type="post_prev"></img>
+                            <div class="container4">
+                                <h4><b>Title: ${post.title}</b></h4> 
+                                <p> Description: ${post.detail} </p>
+                                <p>price : ${post.price}</p>
+                                <p>The Winner: ${post.finalWinner}</p>
+                            </div>
+                        </div>
+                    `;
                 });
             })
             .catch(error => {

@@ -270,31 +270,38 @@ def create_app():
     @app.route('/auctions-won', methods=["GET"])
     def getPostsWon():
         authToken = request.cookies.get('token')
-        salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
-        userDocument = dbQuery("hash", salted, raw=True)[0]
-        username = userDocument["username"]
-        if len(userDocument) == 0:
-            return redirect(request.referrer), 403
-        else:
-            wonPosts = dbQuery("winner", username, all=True, raw=True)[0]
-            return json.dumps(wonPosts)
+        if authToken:
+            salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
+            userDocument = dbQuery("hash", salted, raw=True)[0]
+            username = userDocument["username"]
+            print(f"username = {username}")
+            if len(userDocument) == 0:
+                return redirect(request.referrer), 403
+            else:
+                createdPosts = dbQuery("feature", "posts", all=True, raw=True)
+                for i in createdPosts:
+                    if i["finalWinner"] != username:
+                        createdPosts.remove(i)
+                print(f"created posts:/n{createdPosts}")
+                return json.dumps(createdPosts)
 
     @app.route('/auctions-created', methods=["GET"])
     def getPostsCreated():
         authToken = request.cookies.get('token')
-        salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
-        userDocument = dbQuery("hash", salted, raw=True)[0]
-        username = userDocument["username"]
-        print(f"username = {username}")
-        if len(userDocument) == 0:
-            return redirect(request.referrer), 403
-        else:
-            createdPosts = dbQuery("feature", "posts", all=True, raw=True)
-            for i in createdPosts:
-              if i["username"] != username:
-                  createdPosts.remove(i)
-            print(f"created posts:/n{createdPosts}")
-            return json.dumps(createdPosts)
+        if authToken:
+            salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
+            userDocument = dbQuery("hash", salted, raw=True)[0]
+            username = userDocument["username"]
+            print(f"username = {username}")
+            if len(userDocument) == 0:
+                return redirect(request.referrer), 403
+            else:
+                createdPosts = dbQuery("feature", "posts", all=True, raw=True)
+                for i in createdPosts:
+                    if i["username"] != username:
+                        createdPosts.remove(i)
+                print(f"created posts:/n{createdPosts}")
+                return json.dumps(createdPosts)
 
     @app.route('/post/<int:Number>')
     def allow(Number):
@@ -315,22 +322,12 @@ def create_app():
     def user_dashboard():
         return render_template('user.html')
     
-    auction_history = [
-    {"item_id": 1, "bid": 100, "bidder": "UserA"},
-    {"item_id": 2, "bid": 150, "bidder": "UserB"},
-    # More auction history data...
-]
-
-    @app.route('/auction-history')
-    def get_auction_history():
-        return_val = getPostsWon()
-        return return_val
     
     @app.route('/logout')
     def logout():
-        resp = make_response(redirect('/'))  
-        resp.set_cookie('token', '', expires=0) 
-        return resp
+        resplog = make_response(redirect('/'))  
+        resplog.set_cookie('token', '', expires=0) 
+        return resplog
 
     return app, socketio
 
