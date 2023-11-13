@@ -40,7 +40,7 @@ def create_app():
         
     @socketio.on('submitBid')
     def submit_bid(data):
-        #data -> post id
+        #data -> post idr
         entry = dbQuery("_id", data["_id"], all=False, raw=True)
         try:
             bid = int(data["bid"])
@@ -283,29 +283,7 @@ def create_app():
         else:
             return "Auction not found :("
         
-        @app.route('/auctions-won', methods=["GET"])
-    def getPostsWon():
-        authToken = request.cookies.get('token')
-        salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
-        userDocument = dbQuery("hash", salted, raw=True)[0]
-        username = userDocument["username"]
-        if len(userDocument) == 0:
-            return redirect(request.referrer), 403
-        else:
-            wonPosts = dbQuery("winner", username, all=True, raw=True)
-            return json.dumps(wonPosts)
-
-    @app.route('/auctions-created', methods=["GET"])
-    def getPostsCreated():
-        authToken = request.cookies.get('token')
-        salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
-        userDocument = dbQuery("hash", salted, raw=True)[0]
-        username = userDocument["username"]
-        if len(userDocument) == 0:
-            return redirect(request.referrer), 403
-        else:
-            createdPosts = dbQuery("username", username, all=True, raw=True)
-            return json.dumps(createdPosts)
+    
         
     @app.route('/user_dashboard')
     def user_dashboard():
