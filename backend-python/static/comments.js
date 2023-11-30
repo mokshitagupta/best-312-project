@@ -3,7 +3,7 @@ let socket = null
 
 function websocketConn(id){
     console.log("loaded", id)
-    socket = io.connect('https://localhost', {secure: true});
+    socket = io.connect('https://localhost:8080', {secure: true});
 
     console.log("interval")
     getAuctionTime(id)
