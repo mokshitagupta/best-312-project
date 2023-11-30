@@ -3,7 +3,7 @@ let socket = null
 
 function websocketConn(id){
     console.log("loaded", id)
-    socket = io('https://localhost:8080', {
+    socket = io('https://localhost:443', {
         transports: ['websocket'], 
         upgrade: false
     });
