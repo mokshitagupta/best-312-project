@@ -3,7 +3,7 @@ let socket = null
 
 function websocketConn(id){
     console.log("loaded", id)
-    socket = io('//url', {
+    socket = io('https://bidbig.live', {
         transports: ['websocket']
     });
 
