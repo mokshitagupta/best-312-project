@@ -3,9 +3,8 @@ let socket = null
 
 function websocketConn(id){
     console.log("loaded", id)
-    socket = io('https://localhost', {
-        transports: ['websocket'], 
-        upgrade: false
+    socket = io('//url', {
+        transports: ['websocket']
     });
 
     console.log("interval")
