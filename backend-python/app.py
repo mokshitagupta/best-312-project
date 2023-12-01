@@ -21,6 +21,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(__name__ + '.ConfigClass')
     socketio = SocketIO(app)
+    socketio.init_app(app, cors_allowed_origins="*")
 
     @socketio.on('time')
     def handle_message(data):
