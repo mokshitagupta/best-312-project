@@ -26,6 +26,7 @@ def create_app():
     def handle_message(data):
         id = data["id"]
         entry = dbQuery("_id", id, all=False, raw=True)
+        print("print")
 
         #this is probably where the post auction clean up code will need to be added for LO3
         if len(entry) > 0:
