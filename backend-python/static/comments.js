@@ -45,6 +45,13 @@ function getAuctionTime(id){
 
 }
 
+function hello_world_test(){
+    socket.emit("hello_world", "Hello World!", (response) => {
+        console.log(response);
+    })
+}
+
+
 function submitBid(id){
     
     let bid = document.getElementById("user-bid").value

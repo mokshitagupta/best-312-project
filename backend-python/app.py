@@ -38,7 +38,12 @@ def create_app():
             return retTime
         else:
             return -1
-        
+    
+    @socketio.on('hello_world')
+    def hello_world_test(data):
+        print(f'Recieved from client: {data}')
+        return 'Hello World from Server!!'
+    
     @socketio.on('submitBid')
     def submit_bid(data):
         #data -> post id
