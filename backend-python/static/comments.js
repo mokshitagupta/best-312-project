@@ -3,9 +3,9 @@ let socket = null
 
 function websocketConn(id){
     console.log("loaded", id)
-    socket = io('http://localhost:8080', {
-        transports: ['websocket'], 
-        upgrade: false
+    socket = io.connect('https://' + location.host, {
+        transports: ['websocket'],
+        upgrade: true
     });
 
     console.log("interval")
@@ -44,6 +44,13 @@ function getAuctionTime(id){
     })
 
 }
+
+function hello_world_test(){
+    socket.emit("hello_world", "Hello World!", (response) => {
+        console.log(response);
+    })
+}
+
 
 function submitBid(id){
     

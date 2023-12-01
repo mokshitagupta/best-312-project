@@ -21,11 +21,13 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(__name__ + '.ConfigClass')
     socketio = SocketIO(app)
+    socketio.init_app(app, cors_allowed_origins="*")
 
     @socketio.on('time')
     def handle_message(data):
         id = data["id"]
         entry = dbQuery("_id", id, all=False, raw=True)
+        print("print")
 
         #this is probably where the post auction clean up code will need to be added for LO3
         if len(entry) > 0:
@@ -37,7 +39,12 @@ def create_app():
             return retTime
         else:
             return -1
-        
+    
+    @socketio.on('hello_world')
+    def hello_world_test(data):
+        print(f'Recieved from client: {data}')
+        return 'Hello World from Server!!'
+    
     @socketio.on('submitBid')
     def submit_bid(data):
         #data -> post id
