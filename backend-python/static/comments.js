@@ -4,7 +4,8 @@ let socket = null
 function websocketConn(id){
     console.log("loaded", id)
     socket = io('https://bidbig.live', {
-        transports: ['websocket']
+        transports: ['websocket'],
+        upgrade: true
     });
 
     console.log("interval")
