@@ -4,6 +4,7 @@ let socket = null
 function websocketConn(id){
     console.log("loaded", id)
     socket = io.connect('https://' + location.host, {
+        transports: ['websocket'],
         upgrade: true
     });
 
