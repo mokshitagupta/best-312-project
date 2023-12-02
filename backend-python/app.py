@@ -28,7 +28,7 @@ def create_app():
     limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["10 per hour"],
+    default_limits=["10 per second"],
     storage_uri="memory://",
 )
 
@@ -342,7 +342,7 @@ def create_app():
         return resplog
 
     @app.before_request
-    @limiter.limit("10 per hour")
+    @limiter.limit("10 per second")
     def attack():
         # Forward = request.headers.get('X-Forwarded-For')
         # ip_address = request.headers.get('X-Real-IP')
