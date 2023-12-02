@@ -26,10 +26,10 @@ def create_app():
     socketio = SocketIO(app)
 
     limiter = Limiter(
-    app,
-    key_func=get_remote_address
-    # default_limits=["10 per hour"],
-    # storage_uri="memory://",
+    get_remote_address,
+    app=app,
+    default_limits=["10 per hour"],
+    storage_uri="memory://",
 )
 
     @socketio.on('time')
