@@ -343,6 +343,8 @@ def create_app():
     @app.before_request
     @limiter.limit("10 per hour")
     def attack():
+        ip_address = request.headers.get('X-Forwarded-For')
+        print(ip_address)
         return "Too many Requests"
 
     
@@ -358,7 +360,7 @@ def create_app():
         
 
     #     # Grab the IP
-    #     ip_address = request.headers.get('X-Forwarded-For')
+    #     
 
 
     #     # Check if more than 50 requests within a 10 second period
