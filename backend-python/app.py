@@ -26,10 +26,10 @@ def create_app():
     socketio = SocketIO(app)
 
     limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["10 per hour"],
-    storage_uri="memory://",
+    app,
+    key_func=get_remote_address,
+    # default_limits=["10 per hour"],
+    # storage_uri="memory://",
 )
 
     @socketio.on('time')
@@ -356,11 +356,7 @@ def create_app():
         # print("IP=", ip_address, file=sys.stderr)
         # print("Forward=", Forward, file=sys.stderr)
         # print("hope=", hope, file=sys.stderr)
-        # print("Please work im begging=", sanity, file=sys.stderr)
-
-        return "Too many Requests"
-
-    
+        # print("Please work im begging=", sanity, file=sys.stderr)    
 
 
 
