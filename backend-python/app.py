@@ -9,6 +9,7 @@ from db import *
 import datetime
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import sys
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -346,7 +347,7 @@ def create_app():
         # ip_address = request.headers.get('X-Forwarded-For')
         ip_address = request.headers.get('X-Real-IP')
 
-        print("IP=", ip_address)
+        print("IP=", ip_address, file=sys.stderr)
         return "Too many Requests"
 
     
