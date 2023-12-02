@@ -349,7 +349,7 @@ def create_app():
         # hope = request.headers.get('X-hope')
         # sanity = request.headers.get('Sanity-Check')
 
-        print(request)
+        print("Full Request:", request, file=sys.stderr)
 
         for i in request.headers:
             print("I=", i, file=sys.stderr)
