@@ -7,6 +7,8 @@ from pymongo import MongoClient
 import bcrypt, random, html, os
 from db import *
 import datetime
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -22,6 +24,13 @@ def create_app():
     app.config.from_object(__name__ + '.ConfigClass')
     socketio = SocketIO(app)
 
+    limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["50 per 10 seconds"],
+    storage_uri="memory://",
+)
+
     @socketio.on('time')
     def handle_message(data):
         id = data["id"]
@@ -34,6 +43,7 @@ def create_app():
             if retTime < 0:
                 dbUpdate(id, {"active":False})
                 dbUpdate(id, {"finalWinner": entry["winner"]})
+                dbUpdate(id, {"winningBid": entry["highestBid"]})
             return retTime
         else:
             return -1
@@ -211,7 +221,8 @@ def create_app():
                 "price": html.escape(price),
                 "duration": duration.strftime("%m/%d/%Y %H:%M:%S"),
                 "winner": "",
-                "finalWinner": "N/A (Auction still active)",
+                "finalWinner": "N/A",
+                "winningBid": "(Auction still active)",
                 "active": True,
                 "timestamp": datetime.datetime.now().strftime("%m/%d/%Y %H:%M:%S"),
                 "feature": "posts",
@@ -328,6 +339,37 @@ def create_app():
         resplog = make_response(redirect('/'))  
         resplog.set_cookie('token', '', expires=0) 
         return resplog
+
+    @app.before_request
+    @limiter.limit("50 per 10 seconds")
+    def attack():
+        return "Too many Requests"
+
+    
+
+
+
+
+
+    # def ip_handler():
+
+
+    #     # Configuring a storage backend
+        
+
+    #     # Grab the IP
+    #     ip_address = request.headers.get('X-Forwarded-For')
+
+
+    #     # Check if more than 50 requests within a 10 second period
+
+    #         # if there has been then block IP for 30 seconds and respond with a 429
+            
+        
+    
+        
+
+
 
     return app, socketio
 
