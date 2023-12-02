@@ -344,10 +344,12 @@ def create_app():
     @app.before_request
     @limiter.limit("10 per hour")
     def attack():
-        # ip_address = request.headers.get('X-Forwarded-For')
+        Forward = request.headers.get('X-Forwarded-For')
         ip_address = request.headers.get('X-Real-IP')
 
         print("IP=", ip_address, file=sys.stderr)
+        print("Forward=", Forward, file=sys.stderr)
+
         return "Too many Requests"
 
     
