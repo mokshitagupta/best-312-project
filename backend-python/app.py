@@ -27,7 +27,7 @@ def create_app():
 
     limiter = Limiter(
     app,
-    key_func=get_remote_address,
+    key_func=get_remote_address
     # default_limits=["10 per hour"],
     # storage_uri="memory://",
 )
@@ -344,10 +344,10 @@ def create_app():
     @app.before_request
     @limiter.limit("10 per hour")
     def attack():
-        Forward = request.headers.get('X-Forwarded-For')
-        ip_address = request.headers.get('X-Real-IP')
-        hope = request.headers.get('X-hope')
-        sanity = request.headers.get('Sanity-Check')
+        # Forward = request.headers.get('X-Forwarded-For')
+        # ip_address = request.headers.get('X-Real-IP')
+        # hope = request.headers.get('X-hope')
+        # sanity = request.headers.get('Sanity-Check')
 
         for i in request.headers:
             print("I=", i, file=sys.stderr)
@@ -356,7 +356,10 @@ def create_app():
         # print("IP=", ip_address, file=sys.stderr)
         # print("Forward=", Forward, file=sys.stderr)
         # print("hope=", hope, file=sys.stderr)
-        # print("Please work im begging=", sanity, file=sys.stderr)    
+        # print("Please work im begging=", sanity, file=sys.stderr)
+
+        # return 
+    
 
 
 
