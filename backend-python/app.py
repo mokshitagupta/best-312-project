@@ -349,8 +349,12 @@ def create_app():
         # hope = request.headers.get('X-hope')
         # sanity = request.headers.get('Sanity-Check')
 
+        print(request)
+
         for i in request.headers:
             print("I=", i, file=sys.stderr)
+
+        
         
 
         # print("IP=", ip_address, file=sys.stderr)
