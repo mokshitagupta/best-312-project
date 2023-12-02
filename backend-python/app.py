@@ -347,11 +347,13 @@ def create_app():
         Forward = request.headers.get('X-Forwarded-For')
         ip_address = request.headers.get('X-Real-IP')
         hope = request.headers.get('X-hope')
+        sanity = request.headers.get('Sanity-Check')
         
 
         print("IP=", ip_address, file=sys.stderr)
         print("Forward=", Forward, file=sys.stderr)
         print("hope=", hope, file=sys.stderr)
+        print("Please work im begging=", sanity, file=sys.stderr)
 
         return "Too many Requests"
 
