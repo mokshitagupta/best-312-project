@@ -348,12 +348,15 @@ def create_app():
         ip_address = request.headers.get('X-Real-IP')
         hope = request.headers.get('X-hope')
         sanity = request.headers.get('Sanity-Check')
+
+        for i in request.headers:
+            print("I=", i, file=sys.stderr)
         
 
-        print("IP=", ip_address, file=sys.stderr)
-        print("Forward=", Forward, file=sys.stderr)
-        print("hope=", hope, file=sys.stderr)
-        print("Please work im begging=", sanity, file=sys.stderr)
+        # print("IP=", ip_address, file=sys.stderr)
+        # print("Forward=", Forward, file=sys.stderr)
+        # print("hope=", hope, file=sys.stderr)
+        # print("Please work im begging=", sanity, file=sys.stderr)
 
         return "Too many Requests"
 
