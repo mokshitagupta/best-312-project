@@ -27,7 +27,7 @@ def create_app():
     limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["50 per 10 seconds"],
+    default_limits=["50/10seconds"],
     storage_uri="memory://",
 )
 
@@ -341,7 +341,7 @@ def create_app():
         return resplog
 
     @app.before_request
-    @limiter.limit("50 per 10 seconds")
+    @limiter.limit("50/10seconds")
     def attack():
         return "Too many Requests"
 
