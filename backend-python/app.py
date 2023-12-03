@@ -355,6 +355,7 @@ def create_app():
     @app.route('/auctions-won', methods=["GET"])
     def getPostsWon():
         authToken = request.cookies.get('token')
+        remove_list = []
         if authToken:
             salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
             userDocument = dbQuery("hash", salted, raw=True)[0]
@@ -363,16 +364,19 @@ def create_app():
             if len(userDocument) == 0:
                 return redirect(request.referrer), 403
             else:
-                createdPosts = dbQuery("feature", "posts", all=True, raw=True)
-                for i in createdPosts:
+                wonPosts = dbQuery("feature", "posts", all=True, raw=True)
+                for i in wonPosts:
                     if i["finalWinner"] != username:
-                        createdPosts.remove(i)
-                print(f"created posts:/n{createdPosts}")
-                return json.dumps(createdPosts)
+                        remove_list.append(i)
+                for i in remove_list:
+                    wonPosts.remove(i)
+                print(f"created posts:/n{wonPosts}")
+                return json.dumps(wonPosts)
 
     @app.route('/auctions-created', methods=["GET"])
     def getPostsCreated():
         authToken = request.cookies.get('token')
+        remove_list = []
         if authToken:
             salted = bcrypt.hashpw(authToken.encode("utf-8"), getSalt())
             userDocument = dbQuery("hash", salted, raw=True)[0]
@@ -384,7 +388,9 @@ def create_app():
                 createdPosts = dbQuery("feature", "posts", all=True, raw=True)
                 for i in createdPosts:
                     if i["username"] != username:
-                        createdPosts.remove(i)
+                        remove_list.append(i)
+                for i in remove_list:
+                    createdPosts.remove(i)
                 print(f"created posts:/n{createdPosts}")
                 return json.dumps(createdPosts)
 
