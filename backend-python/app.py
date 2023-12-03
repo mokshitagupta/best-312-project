@@ -1,20 +1,77 @@
 import json
 
-from flask import Flask, flash, render_template_string, render_template, request, Response, make_response, redirect, url_for, jsonify
+from flask import Flask, flash, render_template_string, session, render_template, request, Response, make_response, redirect, url_for, jsonify
 from flask_socketio import SocketIO
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
+import webbrowser
+
 import bcrypt, random, html, os
 from db import *
 import datetime
+from google_auth_oauthlib.flow import Flow
+import google_auth_oauthlib.flow
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from email.mime.text import MIMEText
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+import base64
+import google.auth
+import os
+import random, string
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+webbrowser.register('chrome', None, webbrowser.GenericBrowser('/Applications/Google\ Chrome.app %s'))
+
 
 class ConfigClass(object):
     # Flask settings
     SECRET_KEY = 'This is an INSECURE secret!! DO NOT use this in production!!'
 
+
+def save_credentials(credentials):
+    session['credentials'] = {
+        'token': credentials.token,
+        'refresh_token': credentials.refresh_token,
+        'token_uri': credentials.token_uri,
+        'client_id': credentials.client_id,
+        'client_secret': credentials.client_secret,
+        'scopes': credentials.scopes
+    }
+
+def load_credentials():
+    if 'credentials' in session:
+        creds = google.oauth2.credentials.Credentials(**session['credentials'])
+        return creds
+    return None
+
+
+def generateLink(email):
+    base = "https://bidbig.live/verify-account?emailverif="
+    token = "".join(random.choices(string.ascii_uppercase + string.digits, k=85))
+
+    exists, userinfo = getEmailEntry("path", "email-verif", email, all=True)
+
+    if exists:
+        base = base + userinfo["token"] + "&id="+ str(userinfo["_id"])
+        return base
+
+    entry = {
+        "_id": increment(),
+        "path": "email-verif",
+        "token":token,
+        "email":email,
+        "verified":False,
+    }
+
+    base = base+token + "&id="+ str(entry["_id"])
+
+    dbInsert(entry)
+    print(base+token)
+    return base
 
 def create_app():
     # Setup Flask and load app.config
@@ -103,8 +160,20 @@ def create_app():
 
         else:
             exists, entry = getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
-            print(exists, entry)
-            return render_template('comments.html', username=entry["username"], username_hidden=entry["username"])
+            print(exists, entry, query[0]["username"])
+
+            verified, _ =  getUserEntry("path", "verified", entry["username"], all=True)
+            print(entry["username"], verified, "<======= verif status")
+            if verified:
+                return render_template('comments.html', username=entry["username"], username_hidden=entry["username"],
+                                       verif_status='Your email was verified!',
+                                       verif_link="",
+                                       verify_text="")
+            else:
+                return render_template('comments.html', username=entry["username"], username_hidden=entry["username"],
+                                       verif_status='Verify your email here:',
+                                       verif_link=url_for("oauth2callback1"),
+                                       verify_text="Verify!")
         
     @app.route('/create')
     def create():
@@ -336,6 +405,146 @@ def create_app():
         resplog.set_cookie('token', '', expires=0) 
         return resplog
 
+    @app.route('/verify-account')
+    def verifemail():
+        token = request.args.get('emailverif')
+        eid = request.args.get('id')
+
+        exists, entry = getEmailTokenEntry("path", "email-verif", token, all=True)
+        print("INFO =========>>> ",exists, entry,eid)
+
+        if exists:
+            # print(dbUpdate( eid, {"verified":True}))
+
+            entry = {
+                "_id":increment(),
+                "path":"verified",
+                "username":entry["email"]
+            }
+
+            dbInsert(entry)
+            # exists, entry = getEmailTokenEntry("path", "email-verif", token, all=True)
+            # print("NEW ------> ", entry)
+            return redirect("/")
+ 
+        # print(token)
+        return "This link is not valid! Recheck your email for the correct one"
+    
+    @app.route('/test')
+    def oauth2callback1():
+        name = request.cookies.get('token')
+        entry = {}
+        print(name)
+        if name == None:
+            # no auth token
+            return render_template('register.html')
+
+        salted = bcrypt.hashpw(name.encode("utf-8"), getSalt())
+        query = dbQuery("hash", salted, raw=True)
+        if len(query) == 0:
+            return render_template('register.html')
+
+        else:
+            exists, entry = getUserEntry("path", "registeredUsers", query[0]["username"], all=True)
+            print("INFO =========>>> ",exists, entry)
+
+        credentials = None
+        if os.path.exists("auth/token.json"):
+            try:
+                with open("auth/token.json", "r") as token:
+                    print("READ: ", json.load(token))
+                credentials = Credentials.from_authorized_user_file("auth/token.json", ['https://www.googleapis.com/auth/gmail.send'])
+
+            except json.decoder.JSONDecodeError as e:
+                print(f"Error decoding JSON: {e}")
+            
+        if credentials==None or not credentials or not credentials.valid:
+            if credentials and credentials.expired and credentials.refresh_token:
+                credentials.refresh(Request())
+            else:
+                flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+                    "auth/credentials.json", scopes=['https://www.googleapis.com/auth/gmail.send'])
+
+                # The URI created here must exactly match one of the authorized redirect URIs
+                # for the OAuth 2.0 client, which you configured in the API Console. If this
+                # value doesn't match an authorized URI, you will get a 'redirect_uri_mismatch'
+                # error.
+                flow.redirect_uri = url_for('oauth2callback', _external=True)
+
+                authorization_url, state = flow.authorization_url(
+                    # Enable offline access so that you can refresh an access token without
+                    # re-prompting the user for permission. Recommended for web server apps.
+                    access_type='offline',
+                    # Enable incremental authorization. Recommended as a best practice.
+                    include_granted_scopes='true')
+
+                # Store the state so the callback can verify the auth server response.
+                session['state'] = state
+                print("redir", authorization_url)
+                return redirect(authorization_url)
+
+            
+
+        # credentials = service_account.Credentials.from_service_account_file(
+        #     'auth/token.json',
+        #     scopes=['https://www.googleapis.com/auth/gmail.send']
+        # )
+
+        service = build('gmail', 'v1', credentials=credentials)
+
+        link = generateLink(entry["username"])
+
+        message = MIMEText('Go to this link to verify that this is a valid email address: '+link)
+        message['to'] = entry["username"]
+        print("Sending to: ", message['to'])
+        message['from'] = 'bidbig106@gmail.com'
+        message['subject'] = 'Your Bid Big Verification Link!'
+
+        # Encode the message
+        raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
+
+        # Send the email
+        try:
+            message = (service.users().messages().send(userId='me', body={'raw': raw_message}).execute())
+            print('Message Id: %s' % message['id'])
+            return redirect("/")
+        except Exception as e:
+            print(f'An error occurred: {e}')
+            return 'An error occurred while sending the email.'
+        
+    @app.route('/oauth2callback')
+    def oauth2callback():
+
+
+        print('here')
+    # Specify the state when creating the flow in the callback so that it can
+    # verified in the authorization server response.
+        state = session['state']
+
+        flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(
+            "auth/credentials.json", scopes=['https://www.googleapis.com/auth/gmail.send'], state=state)
+        flow.redirect_uri = url_for('oauth2callback', _external=True)
+
+        # Use the authorization server's response to fetch the OAuth 2.0 tokens.
+        authorization_response = request.url
+        flow.fetch_token(authorization_response=authorization_response)
+
+        # Store credentials in the session.
+        # ACTION ITEM: In a production app, you likely want to save these
+        #              credentials in a persistent database instead.
+        credentials = flow.credentials
+        print(credentials.to_json())
+        with open("auth/token.json", "w") as token:
+            token.write(credentials.to_json())
+        with open("auth/token.json", "r") as token:
+            print("WROTE: ", json.load(token))
+
+        
+
+
+        return redirect(url_for('oauth2callback1'))
+            
+
     return app, socketio
 
 
@@ -343,6 +552,9 @@ def create_app():
 
 # Start development web server
 if __name__ == '__main__':
+    os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+    os.environ['PYTHONUNBUFFERED'] = '1'
+
     app, socketio = create_app()
     
     socketio.run(app, port=8080, host='0.0.0.0', debug=True, allow_unsafe_werkzeug=True)
