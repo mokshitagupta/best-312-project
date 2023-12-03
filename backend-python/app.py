@@ -355,8 +355,8 @@ def create_app():
             print("header = ", i, file=sys.stderr)
         for i in request.environ:
             print("enviorn = ", i, file=sys.stderr)
-        for i in request.remote_addr:
-            print("address = ", i, file=sys.stderr)
+        print("address = ", request.remote_addr, file=sys.stderr)
+        print("REMOTE_ADDR = ", request.environ.get("REMOTE_ADDR"), file=sys.stderr)
 
         
 
