@@ -135,7 +135,7 @@ def create_app():
 
 
                     
-                elif bid > entry["highestBid"]:
+                elif bid > entry["highestBid"] and entry["username"]!=userinfo["username"]:
                     # id: id instead of the {'highestBid': {"$exists" : False}}
                     dbUpdate( data["_id"], {"highestBid":bid})
                     dbUpdate( data["_id"], {"winner":userinfo["username"]})
