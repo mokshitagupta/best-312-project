@@ -19,7 +19,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 import base64
 import google.auth
-import os
+import os, sys
 import random, string
 
 UPLOAD_FOLDER = 'static/uploads'
@@ -72,6 +72,15 @@ def generateLink(email):
     dbInsert(entry)
     print(base+token)
     return base
+
+def print_info(request):
+    for i in request.headers:
+        print("header = ", i, file=sys.stderr)
+    for i in request.environ:
+        print("enviorn = ", i, file=sys.stderr)
+    print("address = ", request.remote_addr, file=sys.stderr)
+    print("REMOTE_ADDR = ", request.environ.get("REMOTE_ADDR"), file=sys.stderr)
+    print("address = ", request.remote_addr, file=sys.stderr)
 
 def create_app():
     # Setup Flask and load app.config
