@@ -50,7 +50,7 @@ def load_credentials():
 
 
 def generateLink(email):
-    base = "http://localhost:8080/verify-account?emailverif="
+    base = "https://bidbig.live/verify-account?emailverif="
     token = "".join(random.choices(string.ascii_uppercase + string.digits, k=85))
 
     exists, userinfo = getEmailEntry("path", "email-verif", email, all=True)
@@ -405,20 +405,6 @@ def create_app():
         resplog.set_cookie('token', '', expires=0) 
         return resplog
 
-    @app.route('/verifyEmail')
-    def verifyEmail():
-        credentials = load_credentials()
-        if not credentials or not credentials.valid:
-            # If credentials are not available or are invalid, redirect to authorization
-            flow = Flow.from_client_secrets_file(
-                'auth/credentials.json',
-                scopes=['https://www.googleapis.com/auth/gmail.send'],
-                redirect_uri='http://localhost:8080/test')
-            authorization_url, state = flow.authorization_url()
-            session['state'] = state
-            return redirect(authorization_url)
-        return redirect('/test')
-    
     @app.route('/verify-account')
     def verifemail():
         token = request.args.get('emailverif')
