@@ -352,9 +352,12 @@ def create_app():
         print("Full Request:", request, file=sys.stderr)
 
         for i in request.headers:
-            print("I=", i, file=sys.stderr)
+            print("header = ", i, file=sys.stderr)
+        for i in request.environ:
+            print("enviorn = ", i, file=sys.stderr)
+        for i in request.remote_addr:
+            print("address = ", i, file=sys.stderr)
 
-        
         
 
         # print("IP=", ip_address, file=sys.stderr)
