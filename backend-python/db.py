@@ -50,6 +50,49 @@ def getUserEntry(key, value, find, all=True):
             break
     return found, ret
 
+def getVerfiedStatus(key, value, find, all=True):
+    entries = dbQuery(key, value, raw=True, all=all)
+    print(entries)
+    found = False
+    ret = {}
+
+    # #print("Hear are the results: ", entries)
+    for e in entries:
+        if e["email"] == find:
+            if e["verified"]:
+                found = True
+            ret = e
+            break
+    return found
+
+def getEmailTokenEntry(key, value, find, all=True):
+    entries = dbQuery(key, value, raw=True, all=all)
+    print(entries)
+    found = False
+    ret = {}
+
+    # #print("Hear are the results: ", entries)
+    for e in entries:
+        if e["token"] == find:
+            found = True
+            ret = e
+            break
+    return found, ret
+
+def getEmailEntry(key, value, find, all=True):
+    entries = dbQuery(key, value, raw=True, all=all)
+    print(entries)
+    found = False
+    ret = {}
+
+    # #print("Hear are the results: ", entries)
+    for e in entries:
+        if e["email"] == find:
+            found = True
+            ret = e
+            break
+    return found, ret
+
 #raw parameter decides if the json blob is returned
 def dbQuery(key, val, all=True, raw=False):
     dbname = getDB()
