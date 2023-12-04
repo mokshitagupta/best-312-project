@@ -23,6 +23,7 @@ def print_info(request):
         print("enviorn = ", i, file=sys.stderr)
     print("address = ", request.remote_addr, file=sys.stderr)
     print("REMOTE_ADDR = ", request.environ.get("REMOTE_ADDR"), file=sys.stderr)
+    print("HTTP_X_REAL_IP = ", request.environ.get("HTTP_X_REAL_IP"), file=sys.stderr)
     print("address = ", request.remote_addr, file=sys.stderr)
 
 
